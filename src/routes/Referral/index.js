@@ -2,7 +2,7 @@ const router = require('express').Router();
 const ReferralController = require('../../controllers/Referral');
 
 router.get('/:referral', ReferralController.getReferralDownline);
-router.post('/:code?', ReferralController.compareReferralCode);
+router.post('/', ReferralController.checkReferralCode);
 
 const referralRoutes = router;
 

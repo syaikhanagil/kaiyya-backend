@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const Account = mongoose.model('Account');
 const Referral = mongoose.model('Referral');
 
-const compareReferralCode = (request, response) => {
-    const { code } = request.query;
+const checkReferralCode = (request, response) => {
+    const { referralCode } = request.body;
     Referral.findOne({
-        code
+        code: referralCode
     }).populate('account')
         .then((referral) => {
             response.status(200).json({
@@ -58,7 +58,7 @@ const getReferralDownline = (request, response) => {
 };
 
 const ReferralController = {
-    compareReferralCode,
+    checkReferralCode,
     getReferralDownline
 };
 

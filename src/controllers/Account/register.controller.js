@@ -2,8 +2,8 @@
  * User Registration Controller
  */
 const mongoose = require('mongoose');
+const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-// const Mailer = require('../../mail');
 const Notify = require('../../configs/Notify');
 const CONSTANT = require('../../constant');
 
@@ -73,6 +73,11 @@ exports.register = (request, response) => {
             code: account.verified.verification_code
         };
         await Notify(CONSTANT.MAIL_REGISTRATION, payload);
+        const token = jsonwebtoken.sign({
+            uid: account.id,
+            username: account.username,
+            email: account.email
+        }, 'KIS-APIs', { expiresIn: 120 * 60 });
         return response.status(200).json({
             status: true,
             message: 'new account created',
@@ -80,7 +85,8 @@ exports.register = (request, response) => {
                 username: account.username,
                 fullname: account.fullname,
                 email: account.email,
-                verified: account.verified.status
+                verified: account.verified.status,
+                token
             }
         });
     });

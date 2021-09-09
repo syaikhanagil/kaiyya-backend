@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Product = mongoose.model('Product');
 const Size = mongoose.model('Size');
-// const Image = mongoose.model('Image');
+const Image = mongoose.model('Image');
 
 const createProduct = async (request, response) => {
     const { name, detail, catalog, category, stock, sizes } = request.body;
@@ -157,10 +157,35 @@ const getProductDetail = async (request, response) => {
 //     });
 // };
 
+const deleteProduct = (request, response) => {
+    const { productId } = request.params;
+    Product.deleteOne({
+        _id: productId
+    }).then((product) => {
+        Size.deleteMany({
+            product: productId
+        });
+        Image.deleteMany({
+            product: productId
+        });
+        return response.status(200).json({
+            status: true,
+            message: 'product successfully delete',
+            data: product
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'product can\'t deleted'
+        });
+    });
+};
+
 const ProductController = {
     createProduct,
     getProduct,
-    getProductDetail
+    getProductDetail,
+    deleteProduct
     // editProduct
 };
 
