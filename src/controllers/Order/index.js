@@ -55,6 +55,38 @@ const createOrder = (request, response) => {
     });
 };
 
+const getOrders = (request, response) => {
+    const { uid } = request.session;
+    Order.find({
+        account: uid
+    }).populate('address payment order_detail').then((orders) => {
+        const data = [];
+        for (let i = 0; i < orders.length; i++) {
+            const obj = {
+                id: orders[i].id,
+                external_id: orders[i].external_id,
+                courier: orders[i].courier,
+                subtotal: orders[i].subtotal,
+                status: orders[i].status,
+                payment: orders[i].payment,
+                order_detail: orders[i].order_detail,
+                address: orders[i].address
+            };
+            data.push(obj);
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'successfully get order data',
+            data
+        });
+    }).catch(() => {
+        return response.status(200).json({
+            status: false,
+            message: 'failed to get order data'
+        });
+    });
+};
+
 const getOrder = (request, response) => {
     const { orderId } = request.params;
     Order.findOne({
@@ -73,28 +105,31 @@ const getOrder = (request, response) => {
     });
 };
 
-const getOrders = (request, response) => {
-    const { uid } = request.session;
-    Order.find({
-        account: uid
-    }).populate('address order_detail').then((order) => {
+const updateOrderStatus = (request, response) => {
+    const { orderId } = request.params;
+    const { status } = request.body;
+    Order.findOne({
+        id: orderId
+    }).populate('address payment order_detail').then((order) => {
+        order.status = status;
+        order.save();
         return response.status(200).json({
             status: true,
-            message: 'successfully get order data',
-            data: order
+            message: 'successfully update order status'
         });
     }).catch(() => {
         return response.status(200).json({
             status: false,
-            message: 'failed to get order data'
+            message: 'failed to update order status'
         });
     });
 };
 
 const OrderController = {
     createOrder,
+    getOrders,
     getOrder,
-    getOrders
+    updateOrderStatus
 };
 
 module.exports = OrderController;

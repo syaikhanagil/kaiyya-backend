@@ -15,7 +15,8 @@ const getProfile = (request, response) => {
                 username: account.username,
                 email: account.email,
                 fullname: account.fullname,
-                role: account.role
+                role: account.role,
+                addons: account.addons
             }
         });
     }).catch(() => {
@@ -46,7 +47,8 @@ const updateProfile = async (request, response) => {
                 userId: account.id,
                 username: account.username,
                 email: account.email,
-                fullname: account.fullname
+                fullname: account.fullname,
+                addons: account.addons
             }
         });
     });

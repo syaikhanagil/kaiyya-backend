@@ -47,10 +47,32 @@ const AccountSchema = new Schema({
         lowecase: true,
         default: 'retail'
     },
-    referral: {
+    referral_code: {
         type: String,
         required: true,
         default: 'none'
+    },
+    addons: {
+        referral_point: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        referral_profit: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        shopping_point: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        discount: {
+            type: Number,
+            required: true,
+            default: 0
+        }
     }
 }, { timestamps: true });
 

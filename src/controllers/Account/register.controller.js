@@ -8,10 +8,9 @@ const Notify = require('../../configs/Notify');
 const CONSTANT = require('../../constant');
 
 const Account = mongoose.model('Account');
-const Referral = mongoose.model('Referral');
 
 exports.register = (request, response) => {
-    const { fullname, email, phone, password, referral, role } = request.body;
+    const { fullname, email, phone, password, referralCode, role } = request.body;
     if (!fullname) {
         return response.status(400).json({
             status: false,
@@ -48,7 +47,7 @@ exports.register = (request, response) => {
             verification_code: verificationCode
         },
         role,
-        referral
+        referral_code: referralCode || 'none'
     });
 
     newAccount.save(async (err, account) => {
@@ -59,25 +58,25 @@ exports.register = (request, response) => {
                 message: `${usedField} already registered, please use other ${usedField}`
             });
         }
-        const newReferral = new Referral({
-            account: account.id,
-            code: username
-        });
-        newReferral.save();
         // eslint-disable-next-line new-cap
         const hashId = new Buffer.from(account.id).toString('base64');
+
         const payload = {
             id: hashId,
             email: account.email,
             fullname: account.fullname,
             code: account.verified.verification_code
         };
+
+        // send email verification to user
         await Notify(CONSTANT.MAIL_REGISTRATION, payload);
+
         const token = jsonwebtoken.sign({
             uid: account.id,
             username: account.username,
             email: account.email
         }, 'KIS-APIs', { expiresIn: 120 * 60 });
+
         return response.status(200).json({
             status: true,
             message: 'new account created',

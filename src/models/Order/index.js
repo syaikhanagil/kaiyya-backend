@@ -43,10 +43,10 @@ const OrderSchema = new Schema({
         type: String,
         default: 'unpaid'
     },
-    order_detail: {
+    order_detail: [{
         type: Schema.Types.ObjectId,
         ref: 'OrderDetail'
-    },
+    }],
     payment: {
         type: Schema.Types.ObjectId,
         ref: 'Payment'
