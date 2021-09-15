@@ -58,10 +58,20 @@ const AccountSchema = new Schema({
             required: true,
             default: 0
         },
+        referral_discount: {
+            type: Number,
+            required: true,
+            default: 0
+        },
         referral_profit: {
             type: Number,
             required: true,
             default: 0
+        },
+        allow_withdraw_balance: {
+            type: Boolean,
+            required: true,
+            default: false
         },
         shopping_point: {
             type: Number,

@@ -2,6 +2,8 @@ const router = require('express').Router();
 const AccountController = require('../../controllers/Account');
 
 router.post('/login', AccountController.loginWithEmail);
+router.post('/login/admin', AccountController.loginAdmin);
+
 router.post('/register', AccountController.register);
 router.get('/profile', AccountController.getProfile);
 router.patch('/profile', AccountController.updateProfile);

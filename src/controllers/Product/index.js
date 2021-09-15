@@ -76,7 +76,7 @@ const getProduct = async (request, response) => {
     await Product.find({
         is_active: true
     })
-        .populate('sizes images')
+        .populate('sizes images category')
         .then((product) => {
             const data = [];
             for (let i = 0; i < product.length; i++) {
@@ -86,7 +86,9 @@ const getProduct = async (request, response) => {
                     slug: product[i].slug,
                     stock: product[i].stock,
                     sizes: product[i].sizes,
-                    images: product[i].images
+                    images: product[i].images,
+                    category: product[i].category,
+                    is_active: product[i].is_active ? 'AKTIF' : 'TIDAK AKTIF'
                 };
                 data.push(obj);
             }

@@ -47,7 +47,7 @@ exports.register = (request, response) => {
             verification_code: verificationCode
         },
         role,
-        referral_code: referralCode || 'none'
+        referral_code: referralCode || `kaiyya_${role}`
     });
 
     newAccount.save(async (err, account) => {
