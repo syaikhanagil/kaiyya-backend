@@ -25,13 +25,14 @@ const createCategory = async (request, response) => {
 };
 
 const getCategory = async (request, response) => {
-    Category.find().sort({ name: 1 }).then((category) => {
+    Category.find().sort({ name: 1 }).populate('products').then((category) => {
         const data = [];
         for (let i = 0; i < category.length; i++) {
             const obj = {
                 id: category[i].id,
                 name: category[i].name,
-                slug: category[i].slug
+                slug: category[i].slug,
+                products: category[i].products
             };
             data.push(obj);
         }

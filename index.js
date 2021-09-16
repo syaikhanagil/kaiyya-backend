@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const jsonwebtoken = require('jsonwebtoken');
 const Mongo = require('./src/configs/Mongo');
+const adminRoutes = require('./src/routes/Admin');
 const accountRoutes = require('./src/routes/Account');
 const referralRoutes = require('./src/routes/Referral');
 const imageRoutes = require('./src/routes/Image');
@@ -45,6 +46,7 @@ app.use((request, response, next) => {
     }
 });
 
+app.use('/admin', adminRoutes);
 app.use('/account', accountRoutes);
 app.use('/address', addressRoutes);
 app.use('/category', categoryRoutes);

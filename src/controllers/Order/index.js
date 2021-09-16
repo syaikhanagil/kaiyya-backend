@@ -105,6 +105,36 @@ const getOrder = (request, response) => {
     });
 };
 
+const getOrderData = (request, response) => {
+    Order.find().populate('account address payment order_detail').then((orders) => {
+        const data = [];
+        for (let i = 0; i < orders.length; i++) {
+            const obj = {
+                id: orders[i].id,
+                account: orders[i].account,
+                external_id: orders[i].external_id,
+                courier: orders[i].courier,
+                subtotal: orders[i].subtotal,
+                status: orders[i].status,
+                payment: orders[i].payment,
+                order_detail: orders[i].order_detail,
+                address: orders[i].address
+            };
+            data.push(obj);
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'successfully get order data',
+            data
+        });
+    }).catch(() => {
+        return response.status(200).json({
+            status: false,
+            message: 'failed to get order data'
+        });
+    });
+};
+
 const updateOrderStatus = (request, response) => {
     const { orderId } = request.params;
     const { status } = request.body;
@@ -129,6 +159,7 @@ const OrderController = {
     createOrder,
     getOrders,
     getOrder,
+    getOrderData,
     updateOrderStatus
 };
 

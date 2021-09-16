@@ -39,38 +39,3 @@ exports.loginWithEmail = (request, response) => {
         });
     });
 };
-
-exports.loginAdmin = (request, response) => {
-    const { username, password } = request.body;
-    Account.findOne({
-        username,
-        role: 'admin'
-    }).then((account) => {
-        if (!account.comparePassword(password)) {
-            return response.status(401).json({
-                status: false,
-                message: 'invalid email or password combination'
-            });
-        }
-        const token = jsonwebtoken.sign({
-            uid: account.id,
-            username: account.username,
-            email: account.email
-        }, 'KIS-APIs');
-        return response.status(200).json({
-            status: true,
-            message: 'login success',
-            data: {
-                uid: account.uid,
-                email: account.email,
-                role: account.role,
-                token
-            }
-        });
-    }).catch(() => {
-        response.status(200).json({
-            status: false,
-            message: 'email not registered'
-        });
-    });
-};
