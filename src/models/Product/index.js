@@ -22,6 +22,11 @@ const ProductSchema = new Schema({
         required: true,
         default: 0
     },
+    weight: {
+        type: Number,
+        required: true,
+        default: 100
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'Category',

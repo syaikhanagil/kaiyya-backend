@@ -35,8 +35,23 @@ exports.register = (request, response) => {
             message: 'password is required'
         });
     }
+    if (!role) {
+        return response.status(400).json({
+            status: false,
+            message: 'role is required'
+        });
+    }
     const username = email.split('@')[0].split('.').join('_');
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
+
+    // Define default referral by role
+    let defaultReferral = '';
+    if (!referralCode) {
+        if (role === 'distributor') defaultReferral = 'none';
+        if (role === 'reseller') defaultReferral = 'kaiyya_distributor';
+        if (role === 'subreseller') defaultReferral = 'kaiyya_reseller';
+        if (role === 'retail') defaultReferral = 'kaiyya_subreseller';
+    }
     const newAccount = new Account({
         username,
         fullname,
@@ -47,7 +62,7 @@ exports.register = (request, response) => {
             verification_code: verificationCode
         },
         role,
-        referral_code: referralCode || `kaiyya_${role}`
+        referral_code: referralCode || defaultReferral
     });
 
     newAccount.save(async (err, account) => {
@@ -70,6 +85,7 @@ exports.register = (request, response) => {
 
         // send email verification to user
         await Notify(CONSTANT.MAIL_REGISTRATION, payload);
+        // console.log(payload);
 
         const token = jsonwebtoken.sign({
             uid: account.id,

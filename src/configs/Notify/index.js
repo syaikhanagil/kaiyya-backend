@@ -4,7 +4,7 @@ const Notify = (url, payload) => {
     return new Promise((resolve, reject) => {
         axios({
             method: 'POST',
-            url: `http://localhost:1202${url}`,
+            url: `https://notify.kaiyya.com${url}`,
             headers: {
                 Authorization: 'Bearer KIS'
             },

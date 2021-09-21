@@ -7,6 +7,10 @@ const ImageSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Product'
     },
+    name: {
+        type: String,
+        required: true
+    },
     src: {
         type: String,
         required: true

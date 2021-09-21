@@ -1,13 +1,8 @@
 const router = require('express').Router();
-const multer = require('multer');
 const CatalogController = require('../../controllers/Catalog');
 
-router
-    .route('/')
-    .post(
-        multer({ dest: 'temp/catalog' }).single('image-upload'),
-        CatalogController.createCatalog
-    );
+router.get('/', CatalogController.getCatalog);
+router.get('/detail/:slug', CatalogController.getCatalogDetail);
 
 const catalogRoutes = router;
 

@@ -1,33 +1,54 @@
 const router = require('express').Router();
-const AccountController = require('../../controllers/Account');
-const CategoryController = require('../../controllers/Category');
-const ProductController = require('../../controllers/Product');
-const OrderController = require('../../controllers/Order');
+const multer = require('multer');
+const AdminController = require('../../controllers/Admin');
 
-router.post('/login', AccountController.loginAdmin);
+router.post('/login', AdminController.login);
 
 // Account Route
-router.get('/account', AccountController.getAccounts);
-router.get('/account/:userRole', AccountController.getAccountByRole);
+router.get('/account', AdminController.getAccounts);
+router.get('/account/:userRole', AdminController.getAccountByRole);
+router.get('/account/downline/:username', AdminController.getAccountDownline);
 
 // Product Route
-router.post('/product', ProductController.createProduct);
-router.get('/product', ProductController.getProduct);
-router.patch('/product/:productId', ProductController.getProductDetail);
-router.delete('/product/:productId', ProductController.deleteProduct);
+router.post('/product', AdminController.createProduct);
+router.get('/product', AdminController.getProduct);
+router.get('/product/detail/:slug', AdminController.getProductDetail);
+router.patch('/product/edit/:productId', AdminController.editProduct);
+router.delete('/product/:productId', AdminController.deleteProduct);
+
+// Image Controller
+router
+    .route('/image/upload')
+    .post(
+        multer({ dest: 'temp/product' }).single('image'),
+        AdminController.uploadImage
+    );
 
 // Category Controller
-router.post('/category', CategoryController.createCategory);
-router.get('/category', CategoryController.getCategory);
-router.get('/category/:categoryId/product', CategoryController.createCategory);
-router.patch('/category/:categoryId', CategoryController.createCategory);
-router.delete('/category/:categoryId', CategoryController.createCategory);
+router.post('/category', AdminController.createCategory);
+router.get('/category', AdminController.getCategory);
+router.get('/category/delete/:categoryId', AdminController.deleteCategory);
+router.get('/category/product/:categoryId', AdminController.createCategory);
+router.patch('/category/edit/:categoryId', AdminController.editCategory);
 
-router.post('/order/', OrderController.createOrder);
-router.get('/order/', OrderController.getOrderData);
-router.get('/order/:orderId', OrderController.getOrder);
+// Catalog Controller
+router
+    .route('/catalog')
+    .post(
+        multer({ dest: 'temp/catalog' }).single('image'),
+        AdminController.createCatalog
+    );
+router.get('/catalog', AdminController.getCatalog);
+router.get('/catalog/delete/:catalogId', AdminController.deleteCatalog);
+router.get('/catalog/product/:catalogId', AdminController.createCategory);
+router.patch('/catalog/edit/:catalogId', AdminController.createCategory);
 
-router.patch('/update-status/:orderId', OrderController.updateOrderStatus);
+router.post('/order/', AdminController.createOrder);
+router.get('/order/', AdminController.getOrderData);
+router.get('/order/:orderId', AdminController.getOrder);
+router.patch('/update-status/:orderId', AdminController.updateOrderStatus);
+
+// router.post('/referral/', AdminController.createOrder);
 
 const adminRoutes = router;
 
