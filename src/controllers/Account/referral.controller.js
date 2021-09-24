@@ -18,7 +18,7 @@ exports.checkReferralCode = (request, response) => {
             }
         });
     }).catch(() => {
-        return response.status(200).json({
+        return response.status(400).json({
             status: false,
             message: 'referral code invalid'
         });
