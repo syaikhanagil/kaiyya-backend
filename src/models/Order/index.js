@@ -19,6 +19,10 @@ const OrderSchema = new Schema({
         type: Number,
         required: true
     },
+    resi: {
+        type: Number,
+        default: ''
+    },
     courier: {
         name: {
             type: String,
@@ -51,6 +55,6 @@ const OrderSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Payment'
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Order', OrderSchema);

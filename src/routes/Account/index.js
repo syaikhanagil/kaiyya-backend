@@ -7,6 +7,9 @@ router.post('/register', AccountController.register);
 router.get('/profile', AccountController.getProfile);
 router.patch('/profile', AccountController.updateProfile);
 
+router.get('/ref/check', AccountController.checkReferralCode);
+router.get('/ref/downline', AccountController.getReferralDownline);
+
 router.post('/verify', AccountController.verifyEmail);
 router.get('/verify/request-code', AccountController.requestVerificationCode);
 

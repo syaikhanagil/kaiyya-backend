@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const Xendit = require('../../configs/Xendit');
 
 // const Order = mongoose.model('Order');
@@ -13,13 +14,15 @@ const api = {
 const createVirtualAccount = (request, response) => {
     const { uid } = request.session;
     const { externalId, name, amount, bankCode } = request.body;
+    const date = moment();
     const payload = {
         external_id: externalId,
         name,
         amount,
         bank_code: bankCode,
         expected_amount: amount,
-        is_single_use: true
+        is_single_use: true,
+        expiration_date: date.utc().add(1, 'days').toISOString()
     };
     Xendit('POST', api.virtual_account, payload).then((res) => {
         Order.findOne({
@@ -51,7 +54,8 @@ const createVirtualAccount = (request, response) => {
             });
         });
     }).catch((err) => {
-        return response.status(err).json({
+        console.log(err);
+        return response.status(400).json({
             status: true,
             message: 'can\'t create virtual account',
             data: err
@@ -125,7 +129,36 @@ const callbackVirtualAccountPaid = (request, response) => {
     }).catch(() => {
         return response.status(400).json({
             status: false,
-            message: 'payment unsuccesfully paid'
+            message: `can't find external_id with value ${externalId}`
+        });
+    });
+};
+
+const callbackVirtualAccountUpdate = (request, response) => {
+    const externalId = request.body.external_id;
+    const { status } = request.body;
+    if (!externalId) {
+        return response.status(400).json({
+            status: false,
+            message: 'couldn\'t find external_id'
+        });
+    }
+    Payment.findOne({
+        external_id: externalId
+    }).then((payment) => {
+        if (status === 'INACTIVE') {
+            payment.status = 'inactive';
+            payment.save();
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'status updated',
+            data: payment
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: `can't find external_id with value ${externalId}`
         });
     });
 };
@@ -152,6 +185,7 @@ const PaymentController = {
     createVirtualAccount,
     createQris,
     callbackVirtualAccountPaid,
+    callbackVirtualAccountUpdate,
     getPayment
 };
 

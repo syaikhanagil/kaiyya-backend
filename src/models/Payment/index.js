@@ -35,6 +35,6 @@ const PaymentSchema = new Schema({
         virtual_account_number: String,
         qris_src: String
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Payment', PaymentSchema);

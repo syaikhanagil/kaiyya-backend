@@ -28,8 +28,8 @@ exports.checkReferralCode = (request, response) => {
 exports.getReferralDownline = (request, response) => {
     const { username } = request.session;
     Account.find({
-        referral: username
-    }).then((account) => {
+        referral_code: username
+    }).sort('fullname').then((account) => {
         const data = [];
         for (let i = 0; i < account.length; i++) {
             const obj = {
@@ -58,7 +58,7 @@ exports.getSingleDownlineReport = (request, response) => {
     const { refUsername } = request.params;
     Account.findOne({
         username: refUsername, // username downline
-        referral: username // kode referral upline
+        referral_code: username // kode referral upline
     }).then((account) => {
         Referral.find({
             account: account.id

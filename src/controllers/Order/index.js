@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const Order = mongoose.model('Order');
 const OrderDetail = mongoose.model('OrderDetail');
+// const Product = mongoose.model('Product');
+const Size = mongoose.model('Size');
 
 const createOrder = (request, response) => {
     const { products, address, courierName, courierCode, courierService, courierCost, subtotal } = request.body;
@@ -22,6 +24,7 @@ const createOrder = (request, response) => {
     });
     newOrder.save((err, order) => {
         if (err) {
+            console.log(err);
             return response.status(400).json({
                 status: false,
                 message: 'failed to create order'
@@ -29,6 +32,19 @@ const createOrder = (request, response) => {
         }
         const detailIds = [];
         for (let i = 0; i < products.length; i++) {
+            Size.findOne({
+                _id: products[i].size.id
+            }).then((size) => {
+                const currentStock = size.stock;
+                const newStock = currentStock - products[i].qty;
+                if (newStock < 1) {
+                    size.stock = 0;
+                    size.save();
+                    return;
+                }
+                size.stock = newStock;
+                size.save();
+            });
             const newOrderDetail = new OrderDetail({
                 order: order.id,
                 product: products[i].product.id,
@@ -55,7 +71,7 @@ const createOrder = (request, response) => {
     });
 };
 
-const getOrders = (request, response) => {
+const getOrder = (request, response) => {
     const { uid } = request.session;
     Order.find({
         account: uid
@@ -87,53 +103,50 @@ const getOrders = (request, response) => {
     });
 };
 
-const getOrder = (request, response) => {
+const getOrderDetail = (request, response) => {
     const { orderId } = request.params;
     Order.findOne({
-        id: orderId
-    }).populate('address payment order_detail').then((order) => {
-        return response.status(200).json({
-            status: true,
-            message: 'successfully get order data',
-            data: order
+        _id: orderId
+    })
+        .populate({
+            path: 'order_detail',
+            model: 'OrderDetail',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            }
+        })
+        .populate({
+            path: 'order_detail',
+            model: 'OrderDetail',
+            populate: {
+                path: 'size',
+                model: 'Size'
+            }
+        })
+        .populate('payment address')
+        .then((order) => {
+            return response.status(200).json({
+                status: true,
+                message: 'successfully get order data',
+                data: order
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to get order data'
+            });
         });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to get order data'
-        });
-    });
 };
 
-const getOrderData = (request, response) => {
-    Order.find().populate('account address payment order_detail').then((orders) => {
-        const data = [];
-        for (let i = 0; i < orders.length; i++) {
-            const obj = {
-                id: orders[i].id,
-                account: orders[i].account,
-                external_id: orders[i].external_id,
-                courier: orders[i].courier,
-                subtotal: orders[i].subtotal,
-                status: orders[i].status,
-                payment: orders[i].payment,
-                order_detail: orders[i].order_detail,
-                address: orders[i].address
-            };
-            data.push(obj);
-        }
-        return response.status(200).json({
-            status: true,
-            message: 'successfully get order data',
-            data
-        });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to get order data'
-        });
-    });
-};
+// const payOrder = (request, response) => {
+
+// };
+
+// const cancelOrder = (request, response) => {
+
+// };
 
 const updateOrderStatus = (request, response) => {
     const { orderId } = request.params;
@@ -157,9 +170,8 @@ const updateOrderStatus = (request, response) => {
 
 const OrderController = {
     createOrder,
-    getOrders,
     getOrder,
-    getOrderData,
+    getOrderDetail,
     updateOrderStatus
 };
 
