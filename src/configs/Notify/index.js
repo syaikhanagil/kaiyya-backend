@@ -1,7 +1,7 @@
 const { default: axios } = require('axios');
 
-const baseUrl = 'http://localhost:1202';
-// const baseUrl = 'https://notify.kaiyya.com';
+// const baseUrl = 'http://localhost:1202';
+const baseUrl = 'https://notify.kaiyya.com';
 
 const Notify = (url, payload) => {
     return new Promise((resolve, reject) => {
