@@ -49,9 +49,35 @@ const getService = (request, response) => {
     });
 };
 
+const getShipmentDetail = async (request, response) => {
+    const { code } = request.body;
+    const payload = {
+        waybill: code.split('-')[0],
+        courier: code.split('-')[1]
+    };
+    await axios({
+        method: 'POST',
+        url: 'https://pro.rajaongkir.com/api/waybill',
+        headers,
+        data: qs.stringify(payload)
+    }).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successfully get shipment detail',
+            data: res.data.rajaongkir.result
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'get shipment detail failure'
+        });
+    });
+};
+
 const ShipmentController = {
     getCost,
-    getService
+    getService,
+    getShipmentDetail
 };
 
 module.exports = ShipmentController;

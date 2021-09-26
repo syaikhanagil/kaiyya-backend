@@ -70,10 +70,10 @@ const getAddress = (request, response) => {
     });
 };
 
-// get Address Collection
-const getAddressById = (request, response) => {
-    const { addressId } = request.query;
-    Address.find({
+// get Address Detail
+const getAddressDetail = (request, response) => {
+    const { addressId } = request.params;
+    Address.findOne({
         _id: addressId
     }).then((address) => {
         return response.status(200).json({
@@ -85,6 +85,35 @@ const getAddressById = (request, response) => {
         return response.status(400).json({
             status: false,
             message: 'get address data failed'
+        });
+    });
+};
+
+const editAddress = (request, response) => {
+    const { addressId } = request.params;
+    const { name, phone, province, provinceId, city, cityId, subdistrict, subdistrictId, detail } = request.body;
+    Address.findOne({
+        _id: addressId
+    }).then((address) => {
+        address.name = name;
+        address.phone = phone;
+        address.province = province;
+        address.province_id = provinceId;
+        address.city = city;
+        address.city_id = cityId;
+        address.subdistrict = subdistrict;
+        address.subdistrict_id = subdistrictId;
+        address.detail = detail;
+        address.save();
+        return response.status(200).json({
+            status: true,
+            message: 'address successfully updated',
+            data: address
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'edit address failed'
         });
     });
 };
@@ -150,7 +179,8 @@ const getSubdistrict = async (request, response) => {
 const AddressController = {
     createAddress,
     getAddress,
-    getAddressById,
+    getAddressDetail,
+    editAddress,
     getProvince,
     getCity,
     getSubdistrict

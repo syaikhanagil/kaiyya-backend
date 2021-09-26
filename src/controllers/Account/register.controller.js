@@ -45,12 +45,12 @@ exports.register = (request, response) => {
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
     // Define default referral by role
-    let defaultReferral = '';
+    let defaultRef = '';
     if (!referralCode) {
-        if (role === 'distributor') defaultReferral = 'none';
-        if (role === 'reseller') defaultReferral = 'kaiyya_distributor';
-        if (role === 'subreseller') defaultReferral = 'kaiyya_reseller';
-        if (role === 'retail') defaultReferral = 'kaiyya_subreseller';
+        if (role === 'distributor') defaultRef = 'none';
+        if (role === 'reseller') defaultRef = 'kaiyya_distributor';
+        if (role === 'subreseller') defaultRef = 'kaiyya_reseller';
+        if (role === 'retail') defaultRef = 'kaiyya_subreseller';
     }
     const newAccount = new Account({
         username,
@@ -62,7 +62,7 @@ exports.register = (request, response) => {
             verification_code: verificationCode
         },
         role,
-        referral_code: referralCode || defaultReferral
+        referral_code: referralCode || defaultRef
     });
 
     newAccount.save(async (err, account) => {
@@ -80,7 +80,11 @@ exports.register = (request, response) => {
             id: hashId,
             email: account.email,
             fullname: account.fullname,
-            code: account.verified.verification_code
+            code: account.verified.verification_code,
+            token: jsonwebtoken.sign({
+                uid: account.id,
+                code: verificationCode
+            }, 'KIS-SECRET-VERIFY')
         };
 
         // send email verification to user

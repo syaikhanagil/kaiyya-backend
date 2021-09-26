@@ -18,7 +18,10 @@ const getProduct = async (request, response) => {
                     sizes: product[i].sizes,
                     images: product[i].images,
                     category: product[i].category,
-                    is_active: product[i].is_active ? 'AKTIF' : 'TIDAK AKTIF'
+                    weight: product[i].weight,
+                    is_active: product[i].is_active ? 'AKTIF' : 'TIDAK AKTIF',
+                    createdAt: product[i].createdAt,
+                    updatedAt: product[i].updatedAt
                 };
                 data.push(obj);
             }
@@ -69,7 +72,8 @@ const getProductDetail = async (request, response) => {
                     detail: product.detail,
                     stock: product.stock,
                     sizes,
-                    images
+                    images,
+                    weight: product.weight
                 }
             });
         })

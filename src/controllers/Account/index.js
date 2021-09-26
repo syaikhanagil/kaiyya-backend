@@ -1,16 +1,21 @@
 const { loginWithEmail } = require('./login.controller');
 const { register } = require('./register.controller');
-const { getProfile, updateProfile } = require('./profile.controller');
+const { getProfile, editProfile } = require('./profile.controller');
 const { checkReferralCode, getReferralDownline } = require('./referral.controller');
-const { requestVerificationCode, verifyEmail } = require('./verification.controller');
+const { resetPasswordRequest, resetPasswordTokenVerify, resetPasswordConfirm } = require('./reset-password.contrroller');
+const { requestVerificationCode, verifyAccount } = require('./verification.controller');
 
 const AccountController = {
     loginWithEmail,
     register,
     getProfile,
-    updateProfile,
+    editProfile,
     requestVerificationCode,
-    verifyEmail,
+    verifyAccount,
+
+    resetPasswordRequest,
+    resetPasswordTokenVerify,
+    resetPasswordConfirm,
 
     checkReferralCode,
     getReferralDownline

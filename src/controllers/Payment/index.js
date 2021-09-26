@@ -54,7 +54,6 @@ const createVirtualAccount = (request, response) => {
             });
         });
     }).catch((err) => {
-        console.log(err);
         return response.status(400).json({
             status: true,
             message: 'can\'t create virtual account',
@@ -69,7 +68,7 @@ const createQris = (request, response) => {
     const payload = {
         external_id: externalId,
         type: 'DYNAMIC',
-        callback_url: 'https://kaiyya.com/payment/callback/qris',
+        callback_url: 'https://kaiyya.com/payment/callback/xendit/qris/paid',
         amount
     };
     Xendit('POST', api.qris, payload).then((res) => {
@@ -121,10 +120,16 @@ const callbackVirtualAccountPaid = (request, response) => {
     }).then((payment) => {
         payment.status = 'paid';
         payment.save();
-        return response.status(200).json({
-            status: true,
-            message: 'payment succesfully paid',
-            data: payment
+        Order.findOne({
+            external_id: externalId
+        }).then((order) => {
+            order.status = 'onprocess';
+            order.save();
+            return response.status(200).json({
+                status: true,
+                message: 'payment succesfully paid',
+                data: payment
+            });
         });
     }).catch(() => {
         return response.status(400).json({
@@ -163,6 +168,39 @@ const callbackVirtualAccountUpdate = (request, response) => {
     });
 };
 
+const callbackQrisPaid = (request, response) => {
+    const externalId = request.body.external_id;
+    const { status } = request.body;
+    if (!externalId) {
+        return response.status(400).json({
+            status: false,
+            message: 'couldn\'t find external_id'
+        });
+    }
+    Payment.findOne({
+        external_id: externalId
+    }).then((payment) => {
+        if (status === 'COMPLETED') {
+            payment.status = 'paid';
+            payment.save();
+            return response.status(200).json({
+                status: true,
+                message: 'payment succesfully paid',
+                data: payment
+            });
+        }
+        return response.status(400).json({
+            status: false,
+            message: 'undefined status'
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: `can't find external_id with value ${externalId}`
+        });
+    });
+};
+
 const getPayment = (request, response) => {
     const { paymentId } = request.params;
     Payment.findOne({
@@ -186,6 +224,7 @@ const PaymentController = {
     createQris,
     callbackVirtualAccountPaid,
     callbackVirtualAccountUpdate,
+    callbackQrisPaid,
     getPayment
 };
 

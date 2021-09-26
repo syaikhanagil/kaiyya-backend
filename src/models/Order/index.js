@@ -20,7 +20,7 @@ const OrderSchema = new Schema({
         required: true
     },
     resi: {
-        type: Number,
+        type: String,
         default: ''
     },
     courier: {

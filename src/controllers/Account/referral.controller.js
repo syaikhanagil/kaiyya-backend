@@ -115,3 +115,7 @@ exports.getMultipleDownlineReport = (request, response) => {
         });
     });
 };
+
+// exports.addIncome = (request, response) => {
+//     const { username } = request;
+// };

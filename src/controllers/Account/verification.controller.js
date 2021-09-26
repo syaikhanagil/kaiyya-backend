@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const jsonwebtoken = require('jsonwebtoken');
 const Notify = require('../../configs/Notify');
 const CONSTANT = require('../../constant');
 // const Mailer = require('../../mail');
@@ -32,34 +33,36 @@ const requestVerificationCode = (request, response) => {
     });
 };
 
-const verifyEmail = (request, response) => {
-    const { email, code } = request.body;
-    // const id = new Buffer.from(hashId, 'base64').toString('ascii');
-    Account.findOne({
-        email
-    }, (err, account) => {
+const verifyAccount = (request, response) => {
+    const { token } = request.body;
+    jsonwebtoken.verify(token, 'KIS-SECRET-VERIFY', (err, decode) => {
         if (err) {
             return response.status(400).json({
-                status: true,
-                message: 'email verification failed'
+                status: false,
+                message: 'invalid verify token'
             });
         }
-        if (!account.compareVerificationCode(code)) {
+        Account.findOne({
+            _id: decode.uid
+        }).then((account) => {
+            if (account.verified.code === decode.code) {
+                account.verified.status = true;
+                account.save();
+                return response.status(200).json({
+                    status: true,
+                    message: 'token valid',
+                    data: decode
+                });
+            }
             return response.status(400).json({
                 status: false,
-                message: 'invalid verification code'
+                message: 'invalid verify token'
             });
-        }
-        account.verified.status = true;
-        account.save();
-        return response.status(200).json({
-            status: true,
-            message: 'email verification successful'
         });
     });
 };
 
 module.exports = {
     requestVerificationCode,
-    verifyEmail
+    verifyAccount
 };

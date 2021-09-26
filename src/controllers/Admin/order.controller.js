@@ -154,3 +154,20 @@ exports.updateOrderStatus = (request, response) => {
         });
     });
 };
+
+exports.cancelOrder = (request, response) => {
+    const { status } = request.body;
+    Order.findOne().populate('address payment order_detail').then((order) => {
+        order.status = status;
+        order.save();
+        return response.status(200).json({
+            status: true,
+            message: 'successfully update order status'
+        });
+    }).catch(() => {
+        return response.status(200).json({
+            status: false,
+            message: 'failed to update order status'
+        });
+    });
+};

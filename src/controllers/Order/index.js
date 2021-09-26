@@ -24,7 +24,6 @@ const createOrder = (request, response) => {
     });
     newOrder.save((err, order) => {
         if (err) {
-            console.log(err);
             return response.status(400).json({
                 status: false,
                 message: 'failed to create order'
@@ -35,6 +34,7 @@ const createOrder = (request, response) => {
             Size.findOne({
                 _id: products[i].size.id
             }).then((size) => {
+                // reducing stock
                 const currentStock = size.stock;
                 const newStock = currentStock - products[i].qty;
                 if (newStock < 1) {
@@ -86,6 +86,7 @@ const getOrder = (request, response) => {
                 status: orders[i].status,
                 payment: orders[i].payment,
                 order_detail: orders[i].order_detail,
+                resi: orders[i].resi,
                 address: orders[i].address
             };
             data.push(obj);
@@ -125,6 +126,7 @@ const getOrderDetail = (request, response) => {
             }
         })
         .populate('payment address')
+        .sort('createdAt')
         .then((order) => {
             return response.status(200).json({
                 status: true,
@@ -144,9 +146,37 @@ const getOrderDetail = (request, response) => {
 
 // };
 
-// const cancelOrder = (request, response) => {
+const cancelOrder = (request, response) => {
+    const { orderId } = request.params;
+    Order.findOne({
+        _id: orderId
+    }).populate('order_detail').then((order) => {
+        const detail = order.order_detail;
+        for (let i = 0; i < detail.length; i++) {
+            // return the reduced stock
+            Size.findOne({
+                _id: detail[i].size
+            }).then((size) => {
+                const currentStock = size.stock;
+                const newStock = currentStock + detail[i].qty;
+                size.stock = newStock;
+                size.save();
+            });
+        }
+        order.status = 'cancel';
+        order.save();
 
-// };
+        return response.status(200).json({
+            status: true,
+            message: 'successfully cancel order'
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'failed to cancel order'
+        });
+    });
+};
 
 const updateOrderStatus = (request, response) => {
     const { orderId } = request.params;
@@ -172,6 +202,7 @@ const OrderController = {
     createOrder,
     getOrder,
     getOrderDetail,
+    cancelOrder,
     updateOrderStatus
 };
 

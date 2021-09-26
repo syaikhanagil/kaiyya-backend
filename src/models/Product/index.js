@@ -55,6 +55,6 @@ const ProductSchema = new Schema({
         required: true,
         default: 'ready-stock'
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Product', ProductSchema);
