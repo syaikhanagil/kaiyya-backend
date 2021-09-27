@@ -4,7 +4,8 @@ const { createCatalog, getCatalog, deleteCatalog } = require('./catalog.controll
 const { createCategory, getCategory, editCategory, deleteCategory } = require('./category.controller');
 const { uploadImage, getImage, getImages, deleteImage, deleteImages } = require('./image.controller');
 const { createOrder, getOrder, getOrders, getOrderData, updateOrderStatus } = require('./order.controller');
-const { createProduct, getProduct, getProductDetail, editProduct, deleteProduct } = require('./product.controller');
+const { createSize } = require('./size.controller');
+const { createProductWithSize, createProductWithoutSize, getProduct, getProductDetail, editProduct, deleteProduct } = require('./product.controller');
 
 const AdminController = {
     // account
@@ -37,11 +38,15 @@ const AdminController = {
     updateOrderStatus,
 
     // product
-    createProduct,
+    createProductWithSize,
+    createProductWithoutSize,
     getProduct,
     getProductDetail,
     editProduct,
     deleteProduct,
+
+    // size
+    createSize,
 
     // image
     uploadImage,

@@ -4,7 +4,52 @@ const Product = mongoose.model('Product');
 const Size = mongoose.model('Size');
 const Image = mongoose.model('Image');
 
-exports.createProduct = (request, response) => {
+exports.createProductWithoutSize = (request, response) => {
+    const { name, detail, catalog, category, weight } = request.body;
+    if (!name) {
+        return response.status(200).json({
+            status: false,
+            message: 'name is required'
+        });
+    }
+    if (!detail) {
+        return response.status(200).json({
+            status: false,
+            message: 'detail is required'
+        });
+    }
+    if (!weight) {
+        return response.status(200).json({
+            status: false,
+            message: 'weight is required'
+        });
+    }
+    const slug = name.split(' ').join('-');
+    const newProduct = new Product({
+        name,
+        slug,
+        catalog,
+        category,
+        weight,
+        detail,
+        stock: 0
+    });
+    newProduct.save((err, product) => {
+        if (err) {
+            return response.status(200).json({
+                status: false,
+                message: 'create new product failed'
+            });
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'new product created successfully',
+            data: product
+        });
+    });
+};
+
+exports.createProductWithSize = (request, response) => {
     const { name, detail, catalog, category, stock, weight, sizes } = request.body;
     if (!name) {
         return response.status(200).json({
@@ -54,7 +99,11 @@ exports.createProduct = (request, response) => {
                     product: product.id,
                     name: sizes[i].name,
                     price: sizes[i].price,
-                    stock: sizes[i].stock
+                    stock: sizes[i].stock,
+                    chart: {
+                        length: sizes[i].chart.length,
+                        width: sizes[i].chart.width
+                    }
                 });
                 newSize.save((err2, size) => {
                     if (err2) {
@@ -132,7 +181,8 @@ exports.getProductDetail = async (request, response) => {
                     id: product.sizes[i].id,
                     name: product.sizes[i].name,
                     price: product.sizes[i].price,
-                    stock: product.sizes[i].stock
+                    stock: product.sizes[i].stock,
+                    chart: product.sizes[i].chart
                 };
                 sizes.push(obj);
             }

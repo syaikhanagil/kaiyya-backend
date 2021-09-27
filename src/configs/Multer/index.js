@@ -17,6 +17,7 @@ exports.uploadSingle = (request, response, path) => {
             region
         });
         const s3 = new aws.S3();
+        const fileName = request.file.originalname;
         const params = {
             ACL: 'public-read',
             Bucket: process.env.AWS_BUCKET_NAME,
@@ -30,7 +31,7 @@ exports.uploadSingle = (request, response, path) => {
             }
             fs.unlinkSync(request.file.path); // Empty temp folder
             const resolveObject = {
-                fileName: request.file.originalName,
+                fileName,
                 url: data.Location
             };
             resolve(resolveObject);

@@ -10,7 +10,10 @@ const createCatalog = async (request, response) => {
         const newCatalog = new Catalog({
             name,
             slug,
-            banner
+            banner: {
+                name: banner.fileName,
+                src: banner.url
+            }
         });
         newCatalog.save((err, catalog) => {
             if (err) {

@@ -13,8 +13,14 @@ const CatalogSchema = new Schema({
         lowercase: true
     },
     banner: {
-        type: String,
-        required: true
+        name: {
+            type: String,
+            required: true
+        },
+        src: {
+            type: String,
+            required: true
+        }
     },
     products: [{
         type: Schema.Types.ObjectId,

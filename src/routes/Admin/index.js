@@ -10,7 +10,9 @@ router.get('/account/:userRole', AdminController.getAccountByRole);
 router.get('/account/downline/:username', AdminController.getAccountDownline);
 
 // Product Route
-router.post('/product', AdminController.createProduct);
+router.post('/product/without-size', AdminController.createProductWithoutSize);
+router.post('/product/with-size', AdminController.createProductWithSize);
+router.post('/product/create-size', AdminController.createSize);
 router.get('/product', AdminController.getProduct);
 router.get('/product/detail/:slug', AdminController.getProductDetail);
 router.patch('/product/edit/:productId', AdminController.editProduct);

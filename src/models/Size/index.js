@@ -19,6 +19,14 @@ const SizeSchema = new Schema({
     price: {
         type: Number,
         required: true
+    },
+    chart: {
+        length: {
+            type: Number
+        },
+        width: {
+            type: Number
+        }
     }
 });
 

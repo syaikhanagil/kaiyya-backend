@@ -22,6 +22,7 @@ const createSize = (request, response) => {
                 });
             }
             product.sizes = [...product.sizes, size.id];
+            product.save();
             return response.status(200).json({
                 status: true,
                 message: 'new size created successfully',
