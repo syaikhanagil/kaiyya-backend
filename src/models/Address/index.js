@@ -42,6 +42,11 @@ const AddressSchema = new Schema({
     detail: {
         type: String,
         required: true
+    },
+    is_default: {
+        type: String,
+        required: true,
+        default: false
     }
 });
 

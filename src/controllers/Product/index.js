@@ -71,6 +71,7 @@ const getProductDetail = async (request, response) => {
                     slug: product.slug,
                     detail: product.detail,
                     stock: product.stock,
+                    is_active: product.is_active,
                     sizes,
                     images,
                     weight: product.weight

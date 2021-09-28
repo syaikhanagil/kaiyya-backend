@@ -286,3 +286,24 @@ exports.deleteProduct = (request, response) => {
         });
     });
 };
+
+exports.productActiveStatus = (request, response) => {
+    const { productId } = request.params;
+    const { status } = request.body;
+    Product.findOne({
+        _id: productId
+    }).then((product) => {
+        product.is_active = status;
+        product.save();
+        return response.status(200).json({
+            status: true,
+            message: 'product status updated successfully',
+            data: product
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'product status can\'t updated'
+        });
+    });
+};

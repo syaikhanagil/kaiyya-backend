@@ -135,6 +135,35 @@ exports.getOrderData = (request, response) => {
     });
 };
 
+exports.getOrderByAccountAndStatus = (request, response) => {
+    const { accountId, status } = request.params;
+    Order.find({
+        account: accountId,
+        status
+    }).then((order) => {
+        const data = [];
+        for (let i = 0; i < order.length; i++) {
+            const obj = {
+                id: order[i].id,
+                account: order[i].account,
+                external_id: order[i].external_id,
+                courier: order[i].courier,
+                subtotal: order[i].subtotal,
+                status: order[i].status,
+                payment: order[i].payment,
+                order_detail: order[i].order_detail,
+                address: order[i].address
+            };
+            data.push(obj);
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'successfully get order data',
+            data
+        });
+    });
+};
+
 exports.updateOrderStatus = (request, response) => {
     const { orderId } = request.params;
     const { status } = request.body;

@@ -16,7 +16,8 @@ router.post('/product/create-size', AdminController.createSize);
 router.get('/product', AdminController.getProduct);
 router.get('/product/detail/:slug', AdminController.getProductDetail);
 router.patch('/product/edit/:productId', AdminController.editProduct);
-router.delete('/product/:productId', AdminController.deleteProduct);
+router.delete('/product/delete/:productId', AdminController.deleteProduct);
+router.patch('/product/status/:productId', AdminController.productActiveStatus);
 
 // Image Controller
 router
@@ -44,6 +45,15 @@ router.get('/catalog', AdminController.getCatalog);
 router.get('/catalog/delete/:catalogId', AdminController.deleteCatalog);
 router.get('/catalog/product/:catalogId', AdminController.createCategory);
 router.patch('/catalog/edit/:catalogId', AdminController.createCategory);
+
+// Banner Controller
+router
+    .route('/banner')
+    .post(
+        multer({ dest: 'temp/banner' }).single('image'),
+        AdminController.uploadBanner
+    );
+router.get('/banner', AdminController.getBanner);
 
 router.post('/order/', AdminController.createOrder);
 router.get('/order/', AdminController.getOrderData);

@@ -31,7 +31,7 @@ exports.uploadSingle = (request, response, path) => {
             }
             fs.unlinkSync(request.file.path); // Empty temp folder
             const resolveObject = {
-                fileName,
+                fileName: fileName.split('.')[0],
                 url: data.Location
             };
             resolve(resolveObject);

@@ -1,28 +1,22 @@
 const mongoose = require('mongoose');
-const upload = require('../../configs/Multer');
+const { uploadSingle } = require('../../configs/Multer');
 
 const Banner = mongoose.model('Banner');
 
 exports.uploadBanner = async (request, response) => {
-    const { name, link } = request.body;
-    if (!name) {
-        return response.status(400).json({
-            status: false,
-            message: 'name is required'
-        });
-    }
+    const { link } = request.body;
     if (!link) {
         return response.status(400).json({
             status: false,
             message: 'link is required'
         });
     }
-    await upload(request, response, 'banner')
-        .then((src) => {
+    await uploadSingle(request, response, 'banner')
+        .then((res) => {
             const newBanner = new Banner({
-                name,
+                name: res.fileName,
                 link,
-                src
+                src: res.url
             });
             newBanner.save((err, banner) => {
                 if (err) {

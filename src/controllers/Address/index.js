@@ -6,7 +6,7 @@ const Address = mongoose.model('Address');
 
 const createAddress = (request, response) => {
     const { uid } = request.session;
-    const { name, phone, province, provinceId, city, cityId, subdistrict, subdistrictId, detail } = request.body;
+    const { name, phone, province, provinceId, city, cityId, subdistrict, subdistrictId, detail, isDefault } = request.body;
     const newAddress = new Address({
         account: uid,
         name,
@@ -17,7 +17,8 @@ const createAddress = (request, response) => {
         city_id: cityId,
         subdistrict,
         subdistrict_id: subdistrictId,
-        detail
+        detail,
+        is_default: isDefault || false
     });
     newAddress.save((err, address) => {
         if (err) {
@@ -52,7 +53,8 @@ const getAddress = (request, response) => {
                 cityId: address[i].city_id,
                 subdistrict: address[i].subdistrict,
                 subdistrictId: address[i].subdistrict_id,
-                detail: address[i].detail
+                detail: address[i].detail,
+                is_default: address[i].is_default
             };
             data.push(obj);
         }
@@ -114,6 +116,36 @@ const editAddress = (request, response) => {
         return response.status(400).json({
             status: false,
             message: 'edit address failed'
+        });
+    });
+};
+
+const setDefaultAddress = (request, response) => {
+    const { uid } = request.session;
+    const { addressId } = request.params;
+    // find the default address
+    Address.findOne({
+        account: uid,
+        is_default: true
+    }).then((address) => {
+        // then set is_default to false
+        address.is_default = false;
+        address.save();
+        // find the new address
+        Address.findOne({
+            _id: addressId
+        }).then((address2) => {
+            address2.is_default = false;
+            address2.save();
+            return response.status(400).json({
+                status: false,
+                message: 'edit address failed'
+            });
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'can\'t find the default address'
         });
     });
 };
@@ -181,6 +213,7 @@ const AddressController = {
     getAddress,
     getAddressDetail,
     editAddress,
+    setDefaultAddress,
     getProvince,
     getCity,
     getSubdistrict
