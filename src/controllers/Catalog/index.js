@@ -9,7 +9,9 @@ const getCatalog = async (request, response) => {
             const obj = {
                 id: catalog[i].id,
                 name: catalog[i].name,
-                src: catalog[i].banner
+                slug: catalog[i].slug,
+                banner: catalog[i].banner,
+                products: catalog[i].products
             };
             data.push(obj);
         }

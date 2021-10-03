@@ -2,18 +2,18 @@ const mongoose = require('mongoose');
 
 const Order = mongoose.model('Order');
 const OrderDetail = mongoose.model('OrderDetail');
-// const Product = mongoose.model('Product');
+const Product = mongoose.model('Product');
 const Size = mongoose.model('Size');
 
 const createOrder = (request, response) => {
-    const { products, address, courierName, courierCode, courierService, courierCost, subtotal } = request.body;
+    const { products, address, courierName, courierCode, courierService, courierCost, discount, subtotal } = request.body;
     const { uid } = request.session;
     const invoiceCode = Math.floor(1000000 + Math.random() * 9000000);
-
     const newOrder = new Order({
         account: uid,
         address,
         external_id: `KIS-00${invoiceCode}`,
+        discount,
         courier: {
             name: courierName,
             code: courierCode,
@@ -31,6 +31,20 @@ const createOrder = (request, response) => {
         }
         const detailIds = [];
         for (let i = 0; i < products.length; i++) {
+            Product.findOne({
+                _id: products[i].product.id
+            }).then((product) => {
+                // reducing stock
+                const currentStock = product.stock;
+                const newStock = currentStock - products[i].qty;
+                if (newStock < 1) {
+                    product.stock = 0;
+                    product.save();
+                    return;
+                }
+                product.stock = newStock;
+                product.save();
+            });
             Size.findOne({
                 _id: products[i].size.id
             }).then((size) => {

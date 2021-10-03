@@ -35,7 +35,8 @@ exports.getReferralDownline = (request, response) => {
             const obj = {
                 username: account[i].username,
                 fullname: account[i].fullname,
-                email: account[i].email
+                email: account[i].email,
+                role: account[i].role
             };
             data.push(obj);
         }
@@ -52,6 +53,80 @@ exports.getReferralDownline = (request, response) => {
         });
     });
 };
+
+exports.getReferralDownlineByCode = (request, response) => {
+    const { code } = request.params;
+    Account.find({
+        referral_code: code
+    }).sort('fullname').then((account) => {
+        const data = [];
+        for (let i = 0; i < account.length; i++) {
+            const obj = {
+                username: account[i].username,
+                fullname: account[i].fullname,
+                email: account[i].email,
+                role: account[i].role
+            };
+            data.push(obj);
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'successfully get downline data',
+            data
+        });
+    }).catch(() => {
+        return response.status(200).json({
+            status: false,
+            message: 'failed to get downline data',
+            data: []
+        });
+    });
+};
+
+// exports.getMultipleReferralDownline = (request, response) => {
+//     const { username } = request.session;
+//     Account.find({
+//         referral: username // kode referral upline
+//     }).then((firstDownline) => {
+//         const data = [];
+//         for (let i = 0; i < firstDownline.length; i++) {
+//             Account.find({
+//                 referral: firstDownline[i].username
+//             }).then((secondDowline) => {
+//                 if (secondDowline.length > 0) {
+//                     for (let i2 = 0; i2 < secondDowline.length; i++) {
+//                         const secondObj = {
+//                             username: secondDowline[i].username,
+//                             fullname: secondDowline[i].fullname,
+//                             email: secondDowline[i].email,
+//                             role: secondDowline[i].role
+//                         };
+//                     }
+//                     return;
+//                 }
+//                 const firstObj = {
+//                     username: firstDownline[i].username,
+//                     fullname: firstDownline[i].fullname,
+//                     email: firstDownline[i].email,
+//                     role: firstDownline[i].role,
+//                     downline: []
+//                 };
+//                 data.push(firstObj);
+//             });
+//         }
+//         return response.status(200).json({
+//             status: true,
+//             message: 'successfully get downline data',
+//             data
+//         });
+//     }).catch(() => {
+//         return response.status(200).json({
+//             status: false,
+//             message: 'failed to get downline data',
+//             data: []
+//         });
+//     });
+// };
 
 exports.getSingleDownlineReport = (request, response) => {
     const { username } = request.session;

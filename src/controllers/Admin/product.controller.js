@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 const Product = mongoose.model('Product');
+const Category = mongoose.model('Category');
+const Catalog = mongoose.model('Catalog');
 const Size = mongoose.model('Size');
 const Image = mongoose.model('Image');
 
@@ -41,6 +43,18 @@ exports.createProductWithoutSize = (request, response) => {
                 message: 'create new product failed'
             });
         }
+        Category.findOne({
+            _id: category
+        }).then((res) => {
+            res.products = [...res.product, product.id];
+            res.save();
+        });
+        Catalog.findOne({
+            _id: catalog
+        }).then((res) => {
+            res.products = [...res.product, product.id];
+            res.save();
+        });
         return response.status(200).json({
             status: true,
             message: 'new product created successfully',
@@ -92,6 +106,18 @@ exports.createProductWithSize = (request, response) => {
                 message: 'create new product failed'
             });
         }
+        Category.findOne({
+            _id: category
+        }).then((res) => {
+            res.products = [...res.product, product.id];
+            res.save();
+        });
+        Catalog.findOne({
+            _id: catalog
+        }).then((res) => {
+            res.products = [...res.product, product.id];
+            res.save();
+        });
         if (sizes) {
             const sizeIds = []; // array kosong untuk menampung _id yang akan disimpan
             for (let i = 0; i < sizes.length; i++) {

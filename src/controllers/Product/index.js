@@ -7,6 +7,7 @@ const getProduct = async (request, response) => {
         is_active: true
     })
         .populate('sizes images category')
+        .sort({ createdAt: -1 })
         .then((product) => {
             const data = [];
             for (let i = 0; i < product.length; i++) {
@@ -59,7 +60,8 @@ const getProductDetail = async (request, response) => {
                     id: product.sizes[i].id,
                     name: product.sizes[i].name,
                     price: product.sizes[i].price,
-                    stock: product.sizes[i].stock
+                    stock: product.sizes[i].stock,
+                    chart: product.sizes[i].chart
                 };
                 sizes.push(obj);
             }

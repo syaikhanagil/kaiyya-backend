@@ -14,6 +14,7 @@ router.patch('/profile/edit', AccountController.editProfile);
 
 router.post('/ref/check', AccountController.checkReferralCode);
 router.get('/ref/downline', AccountController.getReferralDownline);
+router.get('/ref/downline/:code', AccountController.getReferralDownlineByCode);
 
 router.post('/verify', AccountController.verifyAccount);
 

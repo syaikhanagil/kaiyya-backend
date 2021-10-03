@@ -7,8 +7,26 @@ const Payment = mongoose.model('Payment');
 const Order = mongoose.model('Order');
 
 const api = {
+    disbursement_bank: 'https://api.xendit.co/available_disbursements_banks',
+    virtual_account_bank: 'https://api.xendit.co/available_virtual_account_banks',
     virtual_account: 'https://api.xendit.co/callback_virtual_accounts/',
     qris: 'https://api.xendit.co/qr_codes/'
+};
+
+const checkAvailableBank = (request, response) => {
+    Xendit('GET', api.virtual_account_bank).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'virtual account successfully created',
+            data: res.data
+        });
+    }).catch((err) => {
+        return response.status(400).json({
+            status: true,
+            message: 'can\'t create virtual account',
+            data: err
+        });
+    });
 };
 
 const createVirtualAccount = (request, response) => {
@@ -220,6 +238,7 @@ const getPayment = (request, response) => {
 };
 
 const PaymentController = {
+    checkAvailableBank,
     createVirtualAccount,
     createQris,
     callbackVirtualAccountPaid,

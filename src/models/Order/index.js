@@ -23,6 +23,10 @@ const OrderSchema = new Schema({
         type: String,
         default: ''
     },
+    discount: {
+        type: Number,
+        default: 0
+    },
     courier: {
         name: {
             type: String,
