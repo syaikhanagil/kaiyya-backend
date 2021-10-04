@@ -19,6 +19,8 @@ router.patch('/product/edit/:productId', AdminController.editProduct);
 router.delete('/product/delete/:productId', AdminController.deleteProduct);
 router.patch('/product/status/:productId', AdminController.productActiveStatus);
 
+router.patch('/product/size/edit/:sizeId', AdminController.editSize);
+
 // Image Controller
 router
     .route('/image/upload')

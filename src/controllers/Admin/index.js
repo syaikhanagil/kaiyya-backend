@@ -2,9 +2,10 @@ const { login, getAccounts, getAccountDownline, getAccountByRole } = require('./
 const { uploadBanner, getBanner, deleteBanner } = require('./banner.controller');
 const { createCatalog, getCatalog, deleteCatalog } = require('./catalog.controller');
 const { createCategory, getCategory, editCategory, deleteCategory } = require('./category.controller');
+const { createFaq, getFaq } = require('./faq.controller');
 const { uploadImage, getImage, getImages, deleteImage, deleteImages } = require('./image.controller');
 const { createOrder, getOrder, getOrders, getOrderData, updateOrderStatus } = require('./order.controller');
-const { createSize } = require('./size.controller');
+const { createSize, editSize } = require('./size.controller');
 const { createProductWithSize, createProductWithoutSize, getProduct, getProductDetail, editProduct, deleteProduct, productActiveStatus } = require('./product.controller');
 
 const AdminController = {
@@ -30,6 +31,10 @@ const AdminController = {
     editCategory,
     deleteCategory,
 
+    // faq
+    createFaq,
+    getFaq,
+
     // order
     createOrder,
     getOrders,
@@ -48,6 +53,7 @@ const AdminController = {
 
     // size
     createSize,
+    editSize,
 
     // image
     uploadImage,

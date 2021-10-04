@@ -42,9 +42,9 @@ const getFaq = (request, response) => {
     });
 };
 
-const faqController = {
+const FaqController = {
     createFaq,
     getFaq
 };
 
-module.exports = faqController;
+module.exports = FaqController;
