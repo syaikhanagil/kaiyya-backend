@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
-const Notify = require('../../configs/Notify');
-const CONSTANT = require('../../constant');
+const Mailer = require('../../mail');
 
 const Account = mongoose.model('Account');
 
@@ -20,7 +19,7 @@ const resetPasswordRequest = (request, response) => {
             name: account.fullname,
             token
         };
-        await Notify(CONSTANT.MAIL_RESET_PASSWORD, payload);
+        await Mailer.sendResetPasswordMail(payload);
         return response.status(200).json({
             status: true,
             message: 'reset link sent successful, check email'

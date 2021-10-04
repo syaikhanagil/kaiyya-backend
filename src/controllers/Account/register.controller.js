@@ -4,8 +4,7 @@
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const Notify = require('../../configs/Notify');
-const CONSTANT = require('../../constant');
+const Mailer = require('../../mail');
 
 const Account = mongoose.model('Account');
 
@@ -87,9 +86,7 @@ exports.register = (request, response) => {
             }, 'KIS-SECRET-VERIFY')
         };
 
-        // send email verification to user
-        await Notify(CONSTANT.MAIL_REGISTRATION, payload);
-        // console.log(payload);
+        await Mailer.sendRegisterMail(payload);
 
         const token = jsonwebtoken.sign({
             uid: account.id,

@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
-const Notify = require('../../configs/Notify');
-const CONSTANT = require('../../constant');
-// const Mailer = require('../../mail');
+const Mailer = require('../../mail');
 
 const Account = mongoose.model('Account');
 
@@ -20,7 +18,7 @@ const requestVerificationCode = (request, response) => {
             code: account.verified.verification_code
         };
         // await Notify.MAIL_VERIFICATION_CODE(payload);
-        await Notify(CONSTANT.MAIL_VERIFICATION_CODE, payload);
+        await Mailer.sendVerificationCodeMail(payload);
         return response.status(200).json({
             status: true,
             message: 'email verification sent'
