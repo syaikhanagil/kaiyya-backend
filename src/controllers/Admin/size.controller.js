@@ -4,16 +4,21 @@ const Size = mongoose.model('Size');
 const Product = mongoose.model('Product');
 
 exports.createSize = (request, response) => {
-    const { productId, name, price, stock } = request.body;
-    const newSize = new Size({
-        product: productId,
-        name,
-        price,
-        stock
-    });
+    const { productId } = request.params;
+    const { name, price, stock, length, width } = request.body;
     Product.findOne({
         _id: productId
     }).then((product) => {
+        const newSize = new Size({
+            product: productId,
+            name,
+            price,
+            stock,
+            chart: {
+                length,
+                width
+            }
+        });
         newSize.save((err, size) => {
             if (err) {
                 return response.status(400).json({
@@ -42,8 +47,8 @@ exports.editSize = (request, response) => {
         size.name = name;
         size.price = price;
         size.stock = stock;
-        size.length = length;
-        size.width = width;
+        size.chart.length = length;
+        size.chart.width = width;
         size.save();
         Product.findOne({
             _id: productId

@@ -12,13 +12,13 @@ router.get('/account/downline/:username', AdminController.getAccountDownline);
 // Product Route
 router.post('/product/without-size', AdminController.createProductWithoutSize);
 router.post('/product/with-size', AdminController.createProductWithSize);
-router.post('/product/create-size', AdminController.createSize);
 router.get('/product', AdminController.getProduct);
 router.get('/product/detail/:slug', AdminController.getProductDetail);
 router.patch('/product/edit/:productId', AdminController.editProduct);
 router.delete('/product/delete/:productId', AdminController.deleteProduct);
 router.patch('/product/status/:productId', AdminController.productActiveStatus);
 
+router.patch('/product/size/create/:productId', AdminController.createSize);
 router.patch('/product/size/edit/:sizeId', AdminController.editSize);
 
 // Image Controller
