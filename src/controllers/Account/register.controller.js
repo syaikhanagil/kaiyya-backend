@@ -67,9 +67,10 @@ exports.register = (request, response) => {
     newAccount.save(async (err, account) => {
         if (err) {
             const usedField = Object.keys(err.keyPattern);
-            return response.status(400).json({
+            return response.status(200).json({
                 status: false,
-                message: `${usedField} already registered, please use other ${usedField}`
+                message: `${usedField} already registered, please use other ${usedField}`,
+                error: usedField[0]
             });
         }
         // eslint-disable-next-line new-cap

@@ -3,18 +3,13 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ReferralSchema = new Schema({
-    referral_account: {
+    account: {
         type: Schema.Types.ObjectId,
         ref: 'Account'
     },
-    order: {
+    referral_account: {
         type: Schema.Types.ObjectId,
-        ref: 'Order'
-    },
-    referral_code: {
-        type: String,
-        required: true,
-        default: 'none'
+        ref: 'Account'
     },
     amount: {
         type: Number,

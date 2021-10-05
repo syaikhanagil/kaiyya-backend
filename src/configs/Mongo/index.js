@@ -5,6 +5,7 @@ require('../../models/Address');
 require('../../models/Banner');
 require('../../models/Category');
 require('../../models/Catalog');
+require('../../models/Faq');
 require('../../models/Order');
 require('../../models/OrderDetail');
 require('../../models/Product');

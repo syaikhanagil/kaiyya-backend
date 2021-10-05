@@ -64,6 +64,9 @@ router.patch('/update-status/:orderId', AdminController.updateOrderStatus);
 
 // router.post('/referral/', AdminController.createOrder);
 
+router.post('/faq', AdminController.createFaq);
+router.get('/faq', AdminController.getFaq);
+
 const adminRoutes = router;
 
 module.exports = adminRoutes;

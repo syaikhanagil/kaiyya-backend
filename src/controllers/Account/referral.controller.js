@@ -83,51 +83,6 @@ exports.getReferralDownlineByCode = (request, response) => {
     });
 };
 
-// exports.getMultipleReferralDownline = (request, response) => {
-//     const { username } = request.session;
-//     Account.find({
-//         referral: username // kode referral upline
-//     }).then((firstDownline) => {
-//         const data = [];
-//         for (let i = 0; i < firstDownline.length; i++) {
-//             Account.find({
-//                 referral: firstDownline[i].username
-//             }).then((secondDowline) => {
-//                 if (secondDowline.length > 0) {
-//                     for (let i2 = 0; i2 < secondDowline.length; i++) {
-//                         const secondObj = {
-//                             username: secondDowline[i].username,
-//                             fullname: secondDowline[i].fullname,
-//                             email: secondDowline[i].email,
-//                             role: secondDowline[i].role
-//                         };
-//                     }
-//                     return;
-//                 }
-//                 const firstObj = {
-//                     username: firstDownline[i].username,
-//                     fullname: firstDownline[i].fullname,
-//                     email: firstDownline[i].email,
-//                     role: firstDownline[i].role,
-//                     downline: []
-//                 };
-//                 data.push(firstObj);
-//             });
-//         }
-//         return response.status(200).json({
-//             status: true,
-//             message: 'successfully get downline data',
-//             data
-//         });
-//     }).catch(() => {
-//         return response.status(200).json({
-//             status: false,
-//             message: 'failed to get downline data',
-//             data: []
-//         });
-//     });
-// };
-
 exports.getSingleDownlineReport = (request, response) => {
     const { username } = request.session;
     const { refUsername } = request.params;
@@ -191,6 +146,19 @@ exports.getMultipleDownlineReport = (request, response) => {
     });
 };
 
+exports.getReferralProfit = (request, response) => {
+    const { uid } = request.session;
+    console.log(uid);
+    Referral.find({
+        account: uid
+    }).populate('referral_account').then((referral) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successful get downline',
+            data: referral
+        });
+    });
+};
 // exports.addIncome = (request, response) => {
 //     const { username } = request;
 // };

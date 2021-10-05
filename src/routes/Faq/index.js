@@ -3,6 +3,6 @@ const FaqController = require('../../controllers/Faq');
 
 router.get('/', FaqController.getFaq);
 
-const categoryRoutes = router;
+const faqRoutes = router;
 
-module.exports = categoryRoutes;
+module.exports = faqRoutes;

@@ -57,6 +57,19 @@ const getReferralDownline = (request, response) => {
     });
 };
 
+const getReferralProfit = (request, response) => {
+    const { uid } = request.session;
+    Referral.find({
+        account: uid
+    }).populate('referral_account').then((referral) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successful get downline',
+            data: referral
+        });
+    });
+};
+
 const testAutomateUpdateReferralPoint = (request, response) => {
     const { subtotal, userCode } = request.query;
     const users = [
@@ -180,6 +193,7 @@ const testAutomateUpdateReferralPoint = (request, response) => {
 const ReferralController = {
     checkReferralCode,
     getReferralDownline,
+    getReferralProfit,
     testAutomateUpdateReferralPoint
 };
 
