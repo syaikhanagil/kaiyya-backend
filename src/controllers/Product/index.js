@@ -6,7 +6,7 @@ const getProduct = async (request, response) => {
     await Product.find({
         is_active: true
     })
-        .populate('sizes images category')
+        .populate('sizes images')
         .sort({ createdAt: -1 })
         .then((product) => {
             const data = [];
@@ -74,6 +74,7 @@ const getProductDetail = async (request, response) => {
                     detail: product.detail,
                     stock: product.stock,
                     is_active: product.is_active,
+                    category: product.category,
                     sizes,
                     images,
                     weight: product.weight
