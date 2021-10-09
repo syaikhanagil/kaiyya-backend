@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 require('../../models/Account');
 require('../../models/Address');
+require('../../models/BankAccount');
 require('../../models/Banner');
 require('../../models/Category');
 require('../../models/Catalog');
