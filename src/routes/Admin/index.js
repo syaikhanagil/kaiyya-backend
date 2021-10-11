@@ -58,14 +58,34 @@ router
 router.get('/banner', AdminController.getBanner);
 
 router.post('/order/', AdminController.createOrder);
-router.get('/order/', AdminController.getOrderData);
-router.get('/order/:orderId', AdminController.getOrder);
+router.get('/order/', AdminController.getOrder);
+router.get('/order/:orderId', AdminController.getOrderDetail);
 router.patch('/update-status/:orderId', AdminController.updateOrderStatus);
 
 // router.post('/referral/', AdminController.createOrder);
 
+// Faq Controller
 router.post('/faq', AdminController.createFaq);
 router.get('/faq', AdminController.getFaq);
+router.patch('/faq/edit/:faqId', AdminController.editFaq);
+router.post('/faq/delete/:faqId', AdminController.deleteFaq);
+
+// Rules Controller
+router.post('/rules', AdminController.createRules);
+router.get('/rules', AdminController.getRules);
+router.patch('/rules/edit/:rulesId', AdminController.editRules);
+router.post('/rules/delete/:rulesId', AdminController.deleteRules);
+
+// Post Controller
+router
+    .route('/post')
+    .post(
+        multer({ dest: 'temp/post' }).single('image'),
+        AdminController.createPost
+    );
+router.get('/post', AdminController.getPost);
+router.get('/post/detail/:postId', AdminController.getPostDetail);
+router.patch('/post/edit/:postId', AdminController.editPost);
 
 const adminRoutes = router;
 

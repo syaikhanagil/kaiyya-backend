@@ -55,39 +55,7 @@ exports.createOrder = (request, response) => {
     });
 };
 
-exports.getOrders = (request, response) => {
-    const { uid } = request.session;
-    Order.find({
-        account: uid
-    }).populate('address payment order_detail').then((orders) => {
-        const data = [];
-        for (let i = 0; i < orders.length; i++) {
-            const obj = {
-                id: orders[i].id,
-                external_id: orders[i].external_id,
-                courier: orders[i].courier,
-                subtotal: orders[i].subtotal,
-                status: orders[i].status,
-                payment: orders[i].payment,
-                order_detail: orders[i].order_detail,
-                address: orders[i].address
-            };
-            data.push(obj);
-        }
-        return response.status(200).json({
-            status: true,
-            message: 'successfully get order data',
-            data
-        });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to get order data'
-        });
-    });
-};
-
-exports.getOrder = (request, response) => {
+exports.getOrderDetail = (request, response) => {
     const { orderId } = request.params;
     Order.findOne({
         id: orderId
@@ -105,7 +73,7 @@ exports.getOrder = (request, response) => {
     });
 };
 
-exports.getOrderData = (request, response) => {
+exports.getOrder = (request, response) => {
     Order.find().populate('account address payment order_detail').then((orders) => {
         const data = [];
         for (let i = 0; i < orders.length; i++) {
@@ -118,7 +86,41 @@ exports.getOrderData = (request, response) => {
                 status: orders[i].status,
                 payment: orders[i].payment,
                 order_detail: orders[i].order_detail,
-                address: orders[i].address
+                address: orders[i].address,
+                createdAt: orders[i].createdAt
+            };
+            data.push(obj);
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'successfully get order data',
+            data
+        });
+    }).catch(() => {
+        return response.status(200).json({
+            status: false,
+            message: 'failed to get order data'
+        });
+    });
+};
+
+exports.getOrderByUser = (request, response) => {
+    const { uid } = request.session;
+    Order.find({
+        account: uid
+    }).populate('address payment order_detail').then((orders) => {
+        const data = [];
+        for (let i = 0; i < orders.length; i++) {
+            const obj = {
+                id: orders[i].id,
+                external_id: orders[i].external_id,
+                courier: orders[i].courier,
+                subtotal: orders[i].subtotal,
+                status: orders[i].status,
+                payment: orders[i].payment,
+                order_detail: orders[i].order_detail,
+                address: orders[i].address,
+                createdAt: orders[i].createdAt
             };
             data.push(obj);
         }

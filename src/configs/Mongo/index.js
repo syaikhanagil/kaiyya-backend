@@ -9,11 +9,13 @@ require('../../models/Catalog');
 require('../../models/Faq');
 require('../../models/Order');
 require('../../models/OrderDetail');
-require('../../models/Product');
 require('../../models/Payment');
+require('../../models/Post');
+require('../../models/Product');
 require('../../models/Size');
 require('../../models/Image');
 require('../../models/Referral');
+require('../../models/Rules');
 
 const Mongo = (uri = String, user = String, pass = String) => mongoose.connect(uri, {
     useCreateIndex: true,

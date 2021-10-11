@@ -109,13 +109,13 @@ exports.createProductWithSize = (request, response) => {
         Category.findOne({
             _id: category
         }).then((res) => {
-            res.products = [...res.product, product.id];
+            res.products = [...res.products, product.id];
             res.save();
         });
         Catalog.findOne({
             _id: catalog
         }).then((res) => {
-            res.products = [...res.product, product.id];
+            res.products = [...res.products, product.id];
             res.save();
         });
         if (sizes) {

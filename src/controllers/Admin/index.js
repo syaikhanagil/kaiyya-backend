@@ -2,11 +2,13 @@ const { login, getAccounts, getAccountDownline, getAccountByRole } = require('./
 const { uploadBanner, getBanner, deleteBanner } = require('./banner.controller');
 const { createCatalog, getCatalog, deleteCatalog } = require('./catalog.controller');
 const { createCategory, getCategory, editCategory, deleteCategory } = require('./category.controller');
-const { createFaq, getFaq } = require('./faq.controller');
+const { createFaq, getFaq, editFaq, deleteFaq } = require('./faq.controller');
 const { uploadImage, getImage, getImages, deleteImage, deleteImages } = require('./image.controller');
-const { createOrder, getOrder, getOrders, getOrderData, updateOrderStatus } = require('./order.controller');
+const { createOrder, getOrder, getOrderDetail, getOrderByUser, updateOrderStatus } = require('./order.controller');
 const { createSize, editSize } = require('./size.controller');
+const { createPost, editPost, getPost, getPostDetail } = require('./post.controller');
 const { createProductWithSize, createProductWithoutSize, getProduct, getProductDetail, editProduct, deleteProduct, productActiveStatus } = require('./product.controller');
+const { createRules, getRules, editRules, deleteRules } = require('./rules.controller');
 
 const AdminController = {
     // account
@@ -34,12 +36,20 @@ const AdminController = {
     // faq
     createFaq,
     getFaq,
+    editFaq,
+    deleteFaq,
+
+    // rules
+    createRules,
+    getRules,
+    editRules,
+    deleteRules,
 
     // order
     createOrder,
-    getOrders,
     getOrder,
-    getOrderData,
+    getOrderDetail,
+    getOrderByUser,
     updateOrderStatus,
 
     // product
@@ -60,7 +70,13 @@ const AdminController = {
     getImage,
     getImages,
     deleteImage,
-    deleteImages
+    deleteImages,
+
+    // post
+    createPost,
+    getPost,
+    getPostDetail,
+    editPost
 };
 
 module.exports = AdminController;

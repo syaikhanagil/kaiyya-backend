@@ -4,7 +4,8 @@ const Xendit = require('../../configs/Xendit');
 const BankAccount = mongoose.model('BankAccount');
 
 const api = {
-    disbursement_bank: 'https://api.xendit.co/available_disbursements_banks'
+    disbursement_bank: 'https://api.xendit.co/available_disbursements_banks',
+    validate_bank: 'https://api.xendit.co/bank_account_data_requests'
 };
 
 const createBankAccount = (request, response) => {
@@ -72,7 +73,31 @@ const getAvailableDisbursementBank = (request, response) => {
     }).catch((err) => {
         return response.status(400).json({
             status: true,
-            message: 'can\'t create virtual account',
+            message: 'can\'t get disbursement bank',
+            data: err
+        });
+    });
+};
+
+/**
+ * GET DISBURSEMENT BANK
+ */
+const bankAccountValidation = (request, response) => {
+    const { bankNumber, bankCode } = request.body;
+    const payload = {
+        bank_account_number: bankNumber,
+        bank_code: bankCode
+    };
+    Xendit('POST', api.validate_bank, payload).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successfully validate account bank',
+            data: res
+        });
+    }).catch((err) => {
+        return response.status(400).json({
+            status: true,
+            message: 'failed to validate bank account',
             data: err
         });
     });
@@ -80,6 +105,7 @@ const getAvailableDisbursementBank = (request, response) => {
 
 const BankAccountController = {
     getAvailableDisbursementBank,
+    bankAccountValidation,
     createBankAccount,
     getBankAccount
 };

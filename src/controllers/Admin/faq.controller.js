@@ -41,3 +41,33 @@ exports.getFaq = (request, response) => {
         });
     });
 };
+
+exports.editFaq = (request, response) => {
+    const { faqId } = request.params;
+    const { title, content } = request.body;
+    Faq.findOne({
+        _id: faqId
+    }).then((faq) => {
+        faq.title = title;
+        faq.content = content;
+        faq.save();
+        return response.status(200).json({
+            status: true,
+            message: 'new faq created successfully',
+            data: faq
+        });
+    });
+};
+
+exports.deleteFaq = (request, response) => {
+    const { faqId } = request.params;
+    Faq.deleteOne({
+        _id: faqId
+    }).then((faq) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successfully delete faq',
+            data: faq
+        });
+    });
+};

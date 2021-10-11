@@ -54,6 +54,11 @@ const ProductSchema = new Schema({
         type: String,
         required: true,
         default: 'ready-stock'
+    },
+    form_link: {
+        type: String,
+        required: false,
+        default: 'none'
     }
 }, { timestamps: true });
 

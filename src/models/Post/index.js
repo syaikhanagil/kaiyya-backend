@@ -7,9 +7,24 @@ const PostSchema = new Schema({
         type: String,
         required: true
     },
-    body: {
+    slug: {
+        type: String,
+        required: true,
+        lowercase: true
+    },
+    content: {
         type: String,
         required: true
+    },
+    thumbnail: {
+        name: {
+            type: String,
+            required: true
+        },
+        src: {
+            type: String,
+            required: true
+        }
     }
 });
 

@@ -47,10 +47,12 @@ exports.getCategory = async (request, response) => {
 exports.editCategory = async (request, response) => {
     const { categoryId } = request.params;
     const { name } = request.body;
+    const slug = name.split(' ').join('-');
     Category.findOne({
         _id: categoryId
     }).then((category) => {
         category.name = name;
+        category.slug = slug;
         category.save();
         return response.status(200).json({
             status: true,
