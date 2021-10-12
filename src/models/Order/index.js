@@ -47,6 +47,11 @@ const OrderSchema = new Schema({
             required: true
         }
     },
+    notes: {
+        type: String,
+        required: false,
+        default: ''
+    },
     status: {
         type: String,
         default: 'unpaid'

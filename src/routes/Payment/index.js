@@ -2,6 +2,7 @@ const router = require('express').Router();
 const PaymentController = require('../../controllers/Payment');
 
 router.get('/:paymentId', PaymentController.getPayment);
+router.post('/check/:paymentId', PaymentController.checkPaymentStatus);
 router.post('/virtual-account', PaymentController.createVirtualAccount);
 router.post('/qris', PaymentController.createQris);
 

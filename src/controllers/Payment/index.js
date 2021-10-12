@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+require('moment/locale/id');
 const Xendit = require('../../configs/Xendit');
 
 const Account = mongoose.model('Account');
@@ -35,6 +36,7 @@ const createVirtualAccount = (request, response) => {
     const { uid } = request.session;
     const { externalId, name, amount, bankCode } = request.body;
     const date = moment();
+    const expired = date.utc().add(1, 'days').toISOString();
     const payload = {
         external_id: externalId,
         name,
@@ -42,7 +44,7 @@ const createVirtualAccount = (request, response) => {
         bank_code: bankCode,
         expected_amount: amount,
         is_single_use: true,
-        expiration_date: date.utc().add(1, 'days').toISOString()
+        expiration_date: expired
     };
     Xendit('POST', api.virtual_account, payload).then((res) => {
         Order.findOne({
@@ -52,6 +54,7 @@ const createVirtualAccount = (request, response) => {
                 account: uid,
                 order: order.id,
                 external_id: externalId,
+                expired,
                 detail: {
                     method: 'virtual-account',
                     name,
@@ -445,6 +448,18 @@ const getPayment = (request, response) => {
     });
 };
 
+const checkPaymentStatus = (request, response) => {
+    const { paymentId } = request.params;
+    Payment.findOne({
+        _id: paymentId
+    }).then((payment) => {
+        return response.status(200).json({
+            status: true,
+            payment_status: payment.status
+        });
+    });
+};
+
 const PaymentController = {
     checkAvailableVirtualAccount,
     createVirtualAccount,
@@ -453,7 +468,8 @@ const PaymentController = {
     callbackVirtualAccountUpdate,
     createQris,
     callbackQrisPaid,
-    getPayment
+    getPayment,
+    checkPaymentStatus
 };
 
 module.exports = PaymentController;

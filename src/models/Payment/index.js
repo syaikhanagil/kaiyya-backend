@@ -34,6 +34,10 @@ const PaymentSchema = new Schema({
         bank_code: String,
         virtual_account_number: String,
         qris_src: String
+    },
+    expired: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 

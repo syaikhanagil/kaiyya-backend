@@ -4,7 +4,15 @@ const Order = mongoose.model('Order');
 const OrderDetail = mongoose.model('OrderDetail');
 
 exports.createOrder = (request, response) => {
-    const { products, address, courierName, courierCode, courierService, courierCost, subtotal } = request.body;
+    const {
+        products,
+        address,
+        courierName,
+        courierCode,
+        courierService,
+        courierCost,
+        subtotal
+    } = request.body;
     const { uid } = request.session;
     const invoiceCode = Math.floor(1000000 + Math.random() * 9000000);
 
@@ -58,83 +66,108 @@ exports.createOrder = (request, response) => {
 exports.getOrderDetail = (request, response) => {
     const { orderId } = request.params;
     Order.findOne({
-        id: orderId
-    }).populate('address payment order_detail').then((order) => {
-        return response.status(200).json({
-            status: true,
-            message: 'successfully get order data',
-            data: order
+        _id: orderId
+    })
+        .populate({
+            path: 'order_detail',
+            model: 'OrderDetail',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            }
+        })
+        .populate({
+            path: 'order_detail',
+            model: 'OrderDetail',
+            populate: {
+                path: 'size',
+                model: 'Size'
+            }
+        })
+        .populate('account address payment')
+        .then((order) => {
+            return response.status(200).json({
+                status: true,
+                message: 'successfully get order data',
+                data: order
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to get order data'
+            });
         });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to get order data'
-        });
-    });
 };
 
 exports.getOrder = (request, response) => {
-    Order.find().populate('account address payment order_detail').then((orders) => {
-        const data = [];
-        for (let i = 0; i < orders.length; i++) {
-            const obj = {
-                id: orders[i].id,
-                account: orders[i].account,
-                external_id: orders[i].external_id,
-                courier: orders[i].courier,
-                subtotal: orders[i].subtotal,
-                status: orders[i].status,
-                payment: orders[i].payment,
-                order_detail: orders[i].order_detail,
-                address: orders[i].address,
-                createdAt: orders[i].createdAt
-            };
-            data.push(obj);
-        }
-        return response.status(200).json({
-            status: true,
-            message: 'successfully get order data',
-            data
+    Order.find()
+        .populate('account address payment order_detail')
+        .then((orders) => {
+            const data = [];
+            for (let i = 0; i < orders.length; i++) {
+                const obj = {
+                    id: orders[i].id,
+                    account: orders[i].account,
+                    external_id: orders[i].external_id,
+                    courier: orders[i].courier,
+                    subtotal: orders[i].subtotal,
+                    status: orders[i].status,
+                    payment: orders[i].payment,
+                    order_detail: orders[i].order_detail,
+                    address: orders[i].address,
+                    createdAt: orders[i].createdAt
+                };
+                data.push(obj);
+            }
+            return response.status(200).json({
+                status: true,
+                message: 'successfully get order data',
+                data
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to get order data'
+            });
         });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to get order data'
-        });
-    });
 };
 
 exports.getOrderByUser = (request, response) => {
     const { uid } = request.session;
     Order.find({
         account: uid
-    }).populate('address payment order_detail').then((orders) => {
-        const data = [];
-        for (let i = 0; i < orders.length; i++) {
-            const obj = {
-                id: orders[i].id,
-                external_id: orders[i].external_id,
-                courier: orders[i].courier,
-                subtotal: orders[i].subtotal,
-                status: orders[i].status,
-                payment: orders[i].payment,
-                order_detail: orders[i].order_detail,
-                address: orders[i].address,
-                createdAt: orders[i].createdAt
-            };
-            data.push(obj);
-        }
-        return response.status(200).json({
-            status: true,
-            message: 'successfully get order data',
-            data
+    })
+        .populate('address payment order_detail')
+        .then((orders) => {
+            const data = [];
+            for (let i = 0; i < orders.length; i++) {
+                const obj = {
+                    id: orders[i].id,
+                    external_id: orders[i].external_id,
+                    courier: orders[i].courier,
+                    subtotal: orders[i].subtotal,
+                    status: orders[i].status,
+                    payment: orders[i].payment,
+                    order_detail: orders[i].order_detail,
+                    address: orders[i].address,
+                    createdAt: orders[i].createdAt
+                };
+                data.push(obj);
+            }
+            return response.status(200).json({
+                status: true,
+                message: 'successfully get order data',
+                data
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to get order data'
+            });
         });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to get order data'
-        });
-    });
 };
 
 exports.getOrderByAccountAndStatus = (request, response) => {
@@ -171,34 +204,40 @@ exports.updateOrderStatus = (request, response) => {
     const { status } = request.body;
     Order.findOne({
         id: orderId
-    }).populate('address payment order_detail').then((order) => {
-        order.status = status;
-        order.save();
-        return response.status(200).json({
-            status: true,
-            message: 'successfully update order status'
+    })
+        .populate('address payment order_detail')
+        .then((order) => {
+            order.status = status;
+            order.save();
+            return response.status(200).json({
+                status: true,
+                message: 'successfully update order status'
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to update order status'
+            });
         });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to update order status'
-        });
-    });
 };
 
 exports.cancelOrder = (request, response) => {
     const { status } = request.body;
-    Order.findOne().populate('address payment order_detail').then((order) => {
-        order.status = status;
-        order.save();
-        return response.status(200).json({
-            status: true,
-            message: 'successfully update order status'
+    Order.findOne()
+        .populate('address payment order_detail')
+        .then((order) => {
+            order.status = status;
+            order.save();
+            return response.status(200).json({
+                status: true,
+                message: 'successfully update order status'
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to update order status'
+            });
         });
-    }).catch(() => {
-        return response.status(200).json({
-            status: false,
-            message: 'failed to update order status'
-        });
-    });
 };
