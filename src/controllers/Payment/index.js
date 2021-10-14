@@ -94,6 +94,8 @@ const createQris = (request, response) => {
         callback_url: 'https://kaiyya.com/payment/callback/xendit/qris/paid',
         amount
     };
+    const date = moment();
+    const expired = date.utc().add(1, 'days').toISOString();
     Xendit('POST', api.qris, payload).then((res) => {
         Order.findOne({
             external_id: externalId
@@ -102,6 +104,7 @@ const createQris = (request, response) => {
                 account: uid,
                 order: order.id,
                 external_id: externalId,
+                expired,
                 detail: {
                     method: 'qris',
                     amount,

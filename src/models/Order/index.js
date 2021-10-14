@@ -50,7 +50,7 @@ const OrderSchema = new Schema({
     notes: {
         type: String,
         required: false,
-        default: ''
+        default: 'none'
     },
     status: {
         type: String,

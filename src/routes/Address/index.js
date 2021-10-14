@@ -10,6 +10,8 @@ router.get('/', AddressController.getAddress);
 
 router.get('/detail/:addressId', AddressController.getAddressDetail);
 router.patch('/edit/:addressId', AddressController.editAddress);
+router.post('/set-default/:addressId', AddressController.setDefaultAddress);
+// router.post('/delete/:addressId', AddressController.de);
 
 const addressRoutes = router;
 module.exports = addressRoutes;

@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
 
 const getProduct = async (request, response) => {
+    const { type } = request.params;
     await Product.find({
+        type: type || 'ready-stock',
         is_active: true
     })
         .populate('sizes images category')

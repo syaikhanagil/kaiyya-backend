@@ -135,17 +135,28 @@ const setDefaultAddress = (request, response) => {
         Address.findOne({
             _id: addressId
         }).then((address2) => {
-            address2.is_default = false;
+            address2.is_default = true;
             address2.save();
-            return response.status(400).json({
+            return response.status(200).json({
                 status: false,
-                message: 'edit address failed'
+                message: 'set default address success'
             });
         });
     }).catch(() => {
-        return response.status(400).json({
-            status: false,
-            message: 'can\'t find the default address'
+        Address.findOne({
+            _id: addressId
+        }).then((address2) => {
+            address2.is_default = true;
+            address2.save();
+            return response.status(200).json({
+                status: false,
+                message: 'set default address success'
+            });
+        }).catch(() => {
+            return response.status(400).json({
+                status: false,
+                message: 'can\'t find the default address'
+            });
         });
     });
 };

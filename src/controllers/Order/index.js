@@ -6,7 +6,7 @@ const Product = mongoose.model('Product');
 const Size = mongoose.model('Size');
 
 const createOrder = (request, response) => {
-    const { products, address, courierName, courierCode, courierService, courierCost, discount, subtotal } = request.body;
+    const { products, address, courierName, courierCode, courierService, courierCost, discount, notes, subtotal } = request.body;
     const { uid } = request.session;
     const invoiceCode = Math.floor(1000000 + Math.random() * 9000000);
     const newOrder = new Order({
@@ -14,6 +14,7 @@ const createOrder = (request, response) => {
         address,
         external_id: `KIS-00${invoiceCode}`,
         discount,
+        notes,
         courier: {
             name: courierName,
             code: courierCode,
