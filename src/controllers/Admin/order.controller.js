@@ -223,21 +223,66 @@ exports.updateOrderStatus = (request, response) => {
 };
 
 exports.cancelOrder = (request, response) => {
-    const { status } = request.body;
-    Order.findOne()
-        .populate('address payment order_detail')
+    const { orderId } = request.params;
+    Order.findOne({
+        _id: orderId
+    })
         .then((order) => {
-            order.status = status;
+            order.status = 'cancel';
             order.save();
             return response.status(200).json({
                 status: true,
-                message: 'successfully update order status'
+                message: 'successfully cancel order'
             });
         })
         .catch(() => {
             return response.status(200).json({
                 status: false,
-                message: 'failed to update order status'
+                message: 'failed to cancel order'
+            });
+        });
+};
+
+exports.confirmOrder = (request, response) => {
+    const { orderId } = request.params;
+    Order.findOne({
+        _id: orderId
+    })
+        .then((order) => {
+            order.status = 'done';
+            order.save();
+            return response.status(200).json({
+                status: true,
+                message: 'successfully confirm order'
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to confirm order'
+            });
+        });
+};
+
+exports.addOrderResi = (request, response) => {
+    const { orderId } = request.params;
+    const { resi } = request.body;
+    Order.findOne({
+        _id: orderId
+    })
+        .then((order) => {
+            order.status = 'shipment';
+            order.resi = resi;
+            order.save();
+            return response.status(200).json({
+                status: true,
+                message: 'successfully shipment order'
+            });
+        })
+        .catch(() => {
+            return response.status(200).json({
+                status: false,
+                message: 'failed to shipment order'
             });
         });
 };

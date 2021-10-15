@@ -11,6 +11,11 @@ const DisbursementSchema = new Schema({
         type: String,
         required: true
     },
+    status: {
+        type: String,
+        required: true,
+        default: 'pending'
+    },
     amount: {
         type: Number,
         default: 10000

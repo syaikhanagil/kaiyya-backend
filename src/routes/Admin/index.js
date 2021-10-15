@@ -60,7 +60,9 @@ router.get('/banner', AdminController.getBanner);
 router.post('/order/', AdminController.createOrder);
 router.get('/order/', AdminController.getOrder);
 router.get('/order/detail/:orderId', AdminController.getOrderDetail);
-router.patch('/update-status/:orderId', AdminController.updateOrderStatus);
+router.patch('/order/cancel/:orderId', AdminController.cancelOrder);
+router.post('/order/confirm/:orderId', AdminController.confirmOrder);
+router.post('/order/add-resi/:orderId', AdminController.addOrderResi);
 
 // router.post('/referral/', AdminController.createOrder);
 
