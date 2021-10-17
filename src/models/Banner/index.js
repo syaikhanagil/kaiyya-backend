@@ -15,6 +15,11 @@ const BannerSchema = new Schema({
         type: String,
         required: true,
         default: '/'
+    },
+    is_active: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 

@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const Banner = mongoose.model('Banner');
 
 const getBanner = async (request, response) => {
-    await Banner.find({})
+    await Banner.find({
+        is_active: true
+    })
         .then((banner) => {
             const data = [];
             for (let i = 0; i < banner.length; i++) {

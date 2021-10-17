@@ -58,7 +58,24 @@ const ProductSchema = new Schema({
     form_link: {
         type: String,
         required: false,
-        default: 'none'
+        default: ''
+    },
+    promo: {
+        status: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        discount_retail: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        discount_mitra: {
+            type: Number,
+            required: true,
+            default: 0
+        }
     }
 }, { timestamps: true });
 

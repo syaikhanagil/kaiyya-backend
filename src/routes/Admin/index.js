@@ -16,6 +16,7 @@ router.get('/product', AdminController.getProduct);
 router.get('/product/detail/:slug', AdminController.getProductDetail);
 router.patch('/product/edit/:productId', AdminController.editProduct);
 router.delete('/product/delete/:productId', AdminController.deleteProduct);
+router.patch('/product/type/:productId', AdminController.productType);
 router.patch('/product/status/:productId', AdminController.productActiveStatus);
 
 router.patch('/product/size/create/:productId', AdminController.createSize);
@@ -56,6 +57,8 @@ router
         AdminController.uploadBanner
     );
 router.get('/banner', AdminController.getBanner);
+router.patch('/banner/status/:bannerId', AdminController.bannerActiveStatus);
+router.post('/banner/delete/:bannerId', AdminController.deleteBanner);
 
 router.post('/order/', AdminController.createOrder);
 router.get('/order/', AdminController.getOrder);

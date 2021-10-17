@@ -48,11 +48,15 @@ exports.deleteBanner = async (request, response) => {
             message: 'id is required'
         });
     }
-    await Banner.findOne({
+    await Banner.deleteOne({
         _id: id
     })
         .then((banner) => {
-            banner.delete();
+            return response.status(200).json({
+                status: false,
+                message: 'banner successfully deleted',
+                data: banner
+            });
         })
         .catch(() => {
             return response.status(400).json({
@@ -70,6 +74,8 @@ exports.getBanner = async (request, response) => {
                 const obj = {
                     id: banner[i].id,
                     name: banner[i].name,
+                    link: banner[i].link,
+                    is_active: banner[i].is_active ? 'AKTIF' : 'TIDAK AKTIF',
                     src: banner[i].src
                 };
                 data.push(obj);
@@ -84,6 +90,30 @@ exports.getBanner = async (request, response) => {
             return response.status(400).json({
                 status: false,
                 message: "cant't get banner data"
+            });
+        });
+};
+
+exports.bannerActiveStatus = (request, response) => {
+    const { bannerId } = request.params;
+    const { status } = request.body;
+    Banner.findOne({
+        _id: bannerId
+    })
+        .then((banner) => {
+            banner.is_active = status;
+            banner.save();
+            return response.status(200).json({
+                status: false,
+                message: 'success update banner data',
+                data: banner
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            return response.status(400).json({
+                status: false,
+                message: "cant't update banner data"
             });
         });
 };

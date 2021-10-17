@@ -64,7 +64,8 @@ const createOrder = (request, response) => {
                 order: order.id,
                 product: products[i].product.id,
                 qty: products[i].qty,
-                size: products[i].size.id
+                size: products[i].size.id,
+                price: products[i].size.price
             });
             newOrderDetail.save((err2, detail) => {
                 detailIds.push(detail.id);
@@ -156,10 +157,6 @@ const getOrderDetail = (request, response) => {
             });
         });
 };
-
-// const payOrder = (request, response) => {
-
-// };
 
 const cancelOrder = (request, response) => {
     const { orderId } = request.params;

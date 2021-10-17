@@ -19,6 +19,10 @@ const OrderDetailSchema = new Schema({
     size: {
         type: Schema.Types.ObjectId,
         ref: 'Size'
+    },
+    price: {
+        type: Number,
+        required: true
     }
 });
 

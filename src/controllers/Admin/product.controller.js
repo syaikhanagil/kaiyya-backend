@@ -64,7 +64,7 @@ exports.createProductWithoutSize = (request, response) => {
 };
 
 exports.createProductWithSize = (request, response) => {
-    const { name, detail, catalog, category, stock, weight, sizes } = request.body;
+    const { name, detail, catalog, category, stock, weight, sizes, link } = request.body;
     if (!name) {
         return response.status(200).json({
             status: false,
@@ -90,6 +90,10 @@ exports.createProductWithSize = (request, response) => {
         }
     }
     const slug = name.split(' ').join('-');
+    let type = 'ready-stock';
+    if (link) {
+        type = 'preorder';
+    }
     const newProduct = new Product({
         name,
         slug,
@@ -97,11 +101,13 @@ exports.createProductWithSize = (request, response) => {
         category,
         weight,
         detail,
+        type,
+        form_link: link,
         stock: sizes ? totalStock : stock
     });
     newProduct.save((err, product) => {
         if (err) {
-            return response.status(200).json({
+            return response.type(200).json({
                 status: false,
                 message: 'create new product failed'
             });
@@ -169,6 +175,7 @@ exports.getProduct = async (request, response) => {
                     images: product[i].images,
                     category: product[i].category,
                     catalog: product[i].catalog,
+                    type: product[i].type,
                     is_active: product[i].is_active ? 'AKTIF' : 'TIDAK AKTIF'
                 };
                 data.push(obj);
@@ -224,6 +231,8 @@ exports.getProductDetail = async (request, response) => {
                     category: product.category,
                     catalog: product.catalog,
                     isActive: product.is_active,
+                    link: product.form_link,
+                    type: product.type,
                     sizes,
                     images
                 }
@@ -239,7 +248,7 @@ exports.getProductDetail = async (request, response) => {
 
 exports.editProduct = async (request, response) => {
     const { productId } = request.params;
-    const { name, detail, catalog, category, stock, weight, sizes, isActive } = request.body;
+    const { name, detail, catalog, category, stock, weight, sizes, link } = request.body;
     if (!name) {
         return response.status(200).json({
             status: false,
@@ -265,6 +274,10 @@ exports.editProduct = async (request, response) => {
         }
     }
     const slug = name.split(' ').join('-');
+    let type = 'ready-stock';
+    if (link) {
+        type = 'preorder';
+    }
     Product.findOne({
         _id: productId
     }).then((product) => {
@@ -274,7 +287,8 @@ exports.editProduct = async (request, response) => {
         product.category = category;
         product.detail = detail;
         product.stock = sizes ? totalStock : stock;
-        product.is_active = isActive;
+        product.form_link = link;
+        product.type = type;
         product.save();
         return response.status(200).json({
             status: true,
@@ -320,6 +334,27 @@ exports.productActiveStatus = (request, response) => {
         _id: productId
     }).then((product) => {
         product.is_active = status;
+        product.save();
+        return response.status(200).json({
+            status: true,
+            message: 'product status updated successfully',
+            data: product
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'product status can\'t updated'
+        });
+    });
+};
+
+exports.productType = (request, response) => {
+    const { productId } = request.params;
+    const { type } = request.body;
+    Product.findOne({
+        _id: productId
+    }).then((product) => {
+        product.type = type;
         product.save();
         return response.status(200).json({
             status: true,
