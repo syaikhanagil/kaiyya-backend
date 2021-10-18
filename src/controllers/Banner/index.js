@@ -12,6 +12,7 @@ const getBanner = async (request, response) => {
                 const obj = {
                     id: banner[i].id,
                     name: banner[i].name,
+                    link: banner[i].link,
                     src: banner[i].src
                 };
                 data.push(obj);
