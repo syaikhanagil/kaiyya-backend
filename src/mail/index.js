@@ -10,7 +10,7 @@ const config = {
     service: 'gmail',
     auth: {
         user: 'noreply@kaiyya.id',
-        pass: 'kaiyya.id1!'
+        pass: 'rahasia2021!'
     }
 };
 
