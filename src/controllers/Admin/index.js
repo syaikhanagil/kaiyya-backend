@@ -1,6 +1,7 @@
 const { login, getAccounts, getAccountDownline, getAccountByRole } = require('./account.controller');
 const { uploadBanner, getBanner, deleteBanner, bannerActiveStatus } = require('./banner.controller');
 const { createCatalog, getCatalog, deleteCatalog } = require('./catalog.controller');
+const { approveDisbursement, getDisbursement } = require('./disbursement.controller');
 const { createCategory, getCategory, editCategory, deleteCategory } = require('./category.controller');
 const { createFaq, getFaq, editFaq, deleteFaq } = require('./faq.controller');
 const { uploadImage, getImage, getImages, deleteImage, deleteImages } = require('./image.controller');
@@ -33,6 +34,10 @@ const AdminController = {
     getCategory,
     editCategory,
     deleteCategory,
+
+    // disbursement
+    getDisbursement,
+    approveDisbursement,
 
     // faq
     createFaq,

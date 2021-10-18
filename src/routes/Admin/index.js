@@ -67,7 +67,8 @@ router.patch('/order/cancel/:orderId', AdminController.cancelOrder);
 router.post('/order/confirm/:orderId', AdminController.confirmOrder);
 router.post('/order/add-resi/:orderId', AdminController.addOrderResi);
 
-// router.post('/referral/', AdminController.createOrder);
+router.get('/disbursement/', AdminController.getDisbursement);
+router.get('/disbursement/:disbursementId', AdminController.approveDisbursement);
 
 // Faq Controller
 router.post('/faq', AdminController.createFaq);

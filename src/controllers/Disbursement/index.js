@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+const Account = mongoose.model('Account');
 const Disbursement = mongoose.model('Disbursement');
 const Notification = mongoose.model('Notification');
 
@@ -27,9 +28,16 @@ const createDisbursement = (request, response) => {
             message: `Penarikan imbalan dengan nominal Rp ${new Intl.NumberFormat().format(amount)} berhasil diajukan, tunggu konfirmasi dari Admin Kaiyya. Konfirmasi ini membutuhkan waktu 1x24 Jam.`
         });
         newNotification.save();
-        return response.status(200).json({
-            message: 'disbursement successfully requested',
-            data: disbursement
+        Account.findOne({
+            _id: uid
+        }).then((account) => {
+            const newPoint = account.addons.referral_point - amount;
+            account.addons.referral_point = newPoint;
+            account.save();
+            return response.status(200).json({
+                message: 'disbursement successfully requested',
+                data: disbursement
+            });
         });
     });
 };
@@ -90,10 +98,40 @@ const getDisbursementDetail = (request, response) => {
     });
 };
 
+const callbackDisbursement = (request, response) => {
+    const externalId = request.body.external_id;
+    const { status } = request.body;
+    if (!externalId) {
+        return response.status(400).json({
+            status: false,
+            message: 'couldn\'t find external_id'
+        });
+    }
+    Disbursement.findOne({
+        external_id: externalId
+    }).then((disbursement) => {
+        if (status === 'COMPLETED') {
+            disbursement.status = 'success';
+            disbursement.save();
+        }
+        return response.status(200).json({
+            status: true,
+            message: 'disbursemnet status updated',
+            data: disbursement
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'can\'t find external_id'
+        });
+    });
+};
+
 const DisbursementController = {
     createDisbursement,
     getDisbursement,
-    getDisbursementDetail
+    getDisbursementDetail,
+    callbackDisbursement
 };
 
 module.exports = DisbursementController;

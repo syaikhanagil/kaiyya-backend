@@ -19,6 +19,7 @@ const faqRoutes = require('./src/routes/Faq');
 const bankAccountRoutes = require('./src/routes/BankAccount');
 const postRoutes = require('./src/routes/Post');
 const disbursementRoutes = require('./src/routes/Disbursement');
+const notificationRoutes = require('./src/routes/Notification');
 
 const app = express();
 const { PORT, MONGO_URI, MONGO_USER, MONGO_PASSWORD } = process.env;
@@ -52,16 +53,17 @@ app.use((request, response, next) => {
 app.use('/admin', adminRoutes);
 app.use('/account', accountRoutes);
 app.use('/address', addressRoutes);
-app.use('/category', categoryRoutes);
-app.use('/catalog', catalogRoutes);
-app.use('/images', imageRoutes);
 app.use('/bank', bankAccountRoutes);
 app.use('/banner', bannerRoutes);
+app.use('/category', categoryRoutes);
+app.use('/catalog', catalogRoutes);
+app.use('/disbursement', disbursementRoutes);
+app.use('/images', imageRoutes);
 app.use('/orders', orderRoutes);
 app.use('/product', productRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/shipment', shipmentRoutes);
-app.use('/disbursement', disbursementRoutes);
+app.use('/notification', notificationRoutes);
 app.use('/faq', faqRoutes);
 app.use('/post', postRoutes);
 app.all('/*', (request, response) => {
