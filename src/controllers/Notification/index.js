@@ -57,6 +57,8 @@ const getNotificationDetail = (request, response) => {
                 id: notification.id,
                 title: notification.title,
                 message: notification.message,
+                group: notification.group,
+                channel: notification.channel,
                 status: notification.status
             }
         });

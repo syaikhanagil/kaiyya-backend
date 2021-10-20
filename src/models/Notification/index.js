@@ -19,6 +19,16 @@ const NotificationSchema = new Schema({
         type: String,
         default: 'unread',
         required: true
+    },
+    channel: {
+        type: String,
+        required: true,
+        default: 'other'
+    },
+    group: {
+        type: String,
+        required: false,
+        default: ''
     }
 }, { timestamps: true });
 

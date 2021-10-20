@@ -20,6 +20,7 @@ const bankAccountRoutes = require('./src/routes/BankAccount');
 const postRoutes = require('./src/routes/Post');
 const disbursementRoutes = require('./src/routes/Disbursement');
 const notificationRoutes = require('./src/routes/Notification');
+const rulesRoutes = require('./src/routes/Rules');
 
 const app = express();
 const { PORT, MONGO_URI, MONGO_USER, MONGO_PASSWORD } = process.env;
@@ -63,6 +64,7 @@ app.use('/orders', orderRoutes);
 app.use('/product', productRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/shipment', shipmentRoutes);
+app.use('/rules', rulesRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/faq', faqRoutes);
 app.use('/post', postRoutes);

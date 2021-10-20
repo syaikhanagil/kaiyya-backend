@@ -73,6 +73,11 @@ const AccountSchema = new Schema({
             required: true,
             default: false
         },
+        shopping_rates: {
+            type: Number,
+            required: true,
+            default: 1000
+        },
         shopping_point: {
             type: Number,
             required: true,

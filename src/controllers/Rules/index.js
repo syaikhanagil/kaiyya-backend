@@ -42,9 +42,9 @@ const getRules = (request, response) => {
     });
 };
 
-const rulesController = {
+const RulesController = {
     createRules,
     getRules
 };
 
-module.exports = rulesController;
+module.exports = RulesController;
