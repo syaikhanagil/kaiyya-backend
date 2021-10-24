@@ -8,6 +8,7 @@ router.post('/login', AdminController.login);
 router.get('/account', AdminController.getAccounts);
 router.get('/account/:userRole', AdminController.getAccountByRole);
 router.get('/account/downline/:username', AdminController.getAccountDownline);
+router.post('/account/create-account', AdminController.createNewAccount);
 
 // Product Route
 router.post('/product/without-size', AdminController.createProductWithoutSize);

@@ -21,7 +21,7 @@ const createOrder = (request, response) => {
             service: courierService,
             cost: courierCost
         },
-        subtotal
+        subtotal: subtotal + courierCost
     });
     newOrder.save((err, order) => {
         if (err) {
