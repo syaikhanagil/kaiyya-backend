@@ -40,6 +40,11 @@ const AccountSchema = new Schema({
             type: String,
             reqired: true,
             default: '040801'
+        },
+        admin: {
+            type: Boolean,
+            require: true,
+            default: false
         }
     },
     role: {
@@ -69,6 +74,11 @@ const AccountSchema = new Schema({
             default: 0
         },
         allow_withdraw_balance: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        suspend: {
             type: Boolean,
             required: true,
             default: false
