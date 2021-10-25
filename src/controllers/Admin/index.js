@@ -1,4 +1,4 @@
-const { login, getAccounts, getAccountDownline, getAccountByRole, createNewAccount } = require('./account.controller');
+const { login, getAccounts, getAccountDownline, getAccountByRole, createNewAccount, editAddons } = require('./account.controller');
 const { uploadBanner, getBanner, deleteBanner, bannerActiveStatus } = require('./banner.controller');
 const { createCatalog, getCatalog, deleteCatalog } = require('./catalog.controller');
 const { approveDisbursement, getDisbursement } = require('./disbursement.controller');
@@ -18,6 +18,7 @@ const AdminController = {
     getAccountDownline,
     getAccountByRole,
     createNewAccount,
+    editAddons,
 
     // banner
     uploadBanner,

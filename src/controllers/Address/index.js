@@ -91,6 +91,25 @@ const getAddressDetail = (request, response) => {
     });
 };
 
+// Delete Address
+const deleteAddress = (request, response) => {
+    const { addressId } = request.params;
+    Address.findOneAndDelete({
+        _id: addressId
+    }).then((address) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successfully delete address data',
+            data: address
+        });
+    }).catch(() => {
+        return response.status(400).json({
+            status: false,
+            message: 'delete address data failed'
+        });
+    });
+};
+
 const editAddress = (request, response) => {
     const { addressId } = request.params;
     const { name, phone, province, provinceId, city, cityId, subdistrict, subdistrictId, detail } = request.body;
@@ -225,6 +244,7 @@ const AddressController = {
     getAddressDetail,
     editAddress,
     setDefaultAddress,
+    deleteAddress,
     getProvince,
     getCity,
     getSubdistrict

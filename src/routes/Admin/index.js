@@ -9,6 +9,7 @@ router.get('/account', AdminController.getAccounts);
 router.get('/account/:userRole', AdminController.getAccountByRole);
 router.get('/account/downline/:username', AdminController.getAccountDownline);
 router.post('/account/create-account', AdminController.createNewAccount);
+router.post('/account/edit-addons/:accountId', AdminController.editAddons);
 
 // Product Route
 router.post('/product/without-size', AdminController.createProductWithoutSize);

@@ -11,7 +11,7 @@ router.get('/', AddressController.getAddress);
 router.get('/detail/:addressId', AddressController.getAddressDetail);
 router.patch('/edit/:addressId', AddressController.editAddress);
 router.post('/set-default/:addressId', AddressController.setDefaultAddress);
-// router.post('/delete/:addressId', AddressController.de);
+router.post('/delete/:addressId', AddressController.deleteAddress);
 
 const addressRoutes = router;
 module.exports = addressRoutes;

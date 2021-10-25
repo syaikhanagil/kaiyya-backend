@@ -91,7 +91,7 @@ const createQris = (request, response) => {
     const payload = {
         external_id: externalId,
         type: 'DYNAMIC',
-        callback_url: 'https://kaiyya.com/payment/callback/xendit/qris/paid',
+        callback_url: 'https://api.kaiyya.com/payment/callback/xendit/qris/paid',
         amount
     };
     const date = moment();

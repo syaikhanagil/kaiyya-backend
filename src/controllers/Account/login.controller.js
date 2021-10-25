@@ -17,6 +17,12 @@ exports.loginWithEmail = (request, response) => {
                 message: 'invalid email or password combination'
             });
         }
+        if (account.addons.suspend === true) {
+            return response.status(400).json({
+                status: false,
+                message: 'account suspended'
+            });
+        }
         const token = jsonwebtoken.sign({
             uid: account.id,
             username: account.username,

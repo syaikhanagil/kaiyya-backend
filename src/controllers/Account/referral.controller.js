@@ -148,7 +148,6 @@ exports.getMultipleDownlineReport = (request, response) => {
 
 exports.getReferralProfit = (request, response) => {
     const { uid } = request.session;
-    console.log(uid);
     Referral.find({
         account: uid
     }).populate('referral_account').then((referral) => {
@@ -159,6 +158,7 @@ exports.getReferralProfit = (request, response) => {
         });
     });
 };
+
 // exports.addIncome = (request, response) => {
 //     const { username } = request;
 // };

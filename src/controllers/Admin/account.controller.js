@@ -65,7 +65,9 @@ exports.getAccounts = (request, response) => {
                     email: filterAccount[i].email,
                     phone: filterAccount[i].phone,
                     role: filterAccount[i].role,
-                    created: filterAccount[i].createdAt
+                    created: filterAccount[i].createdAt,
+                    verified: filterAccount[i].verified,
+                    addons: filterAccount[i].addons
                 };
                 data.push(obj);
             }
@@ -106,6 +108,24 @@ exports.getAccountDownline = (request, response) => {
     Account.find({
         referral_code: username
     }).then((account) => {
+        return response.status(200).json({
+            status: true,
+            data: account
+        });
+    });
+};
+
+exports.editAddons = (request, response) => {
+    const { accountId } = request.params;
+    const { discount, suspend, verified, withdraw } = request.body;
+    Account.findOne({
+        _id: accountId
+    }).then((account) => {
+        account.verified.admin = verified;
+        account.addons.discount = discount;
+        account.addons.suspend = suspend;
+        account.addons.allow_withdraw_balance = withdraw;
+        account.save();
         return response.status(200).json({
             status: true,
             data: account

@@ -46,22 +46,27 @@ exports.register = (request, response) => {
     // Define default referral by role
     let defaultRef = '';
     let defaultVerifiedByAdmin = false;
+    let defaultDiscount = 0;
     if (!referralCode) {
         if (role === 'distributor') {
             defaultRef = 'none';
             defaultVerifiedByAdmin = false;
+            defaultDiscount = 0;
         }
         if (role === 'reseller') {
             defaultRef = 'kaiyya_distributor';
             defaultVerifiedByAdmin = false;
+            defaultDiscount = 0;
         }
         if (role === 'subreseller') {
             defaultRef = 'kaiyya_reseller';
-            defaultVerifiedByAdmin = false;
+            defaultVerifiedByAdmin = true;
+            defaultDiscount = 10;
         }
         if (role === 'retail') {
             defaultRef = 'kaiyya_subreseller';
             defaultVerifiedByAdmin = true;
+            defaultDiscount = 0;
         }
     }
     const newAccount = new Account({
@@ -70,6 +75,9 @@ exports.register = (request, response) => {
         email,
         phone,
         password: bcrypt.hashSync(password, 10),
+        addons: {
+            discount: defaultDiscount
+        },
         verified: {
             admin: defaultVerifiedByAdmin,
             verification_code: verificationCode

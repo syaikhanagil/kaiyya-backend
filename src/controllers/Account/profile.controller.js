@@ -17,7 +17,8 @@ const getProfile = (request, response) => {
                 fullname: account.fullname,
                 phone: account.phone,
                 role: account.role,
-                addons: account.addons
+                addons: account.addons,
+                verified: account.verified
             }
         });
     }).catch(() => {
