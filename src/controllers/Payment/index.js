@@ -3,10 +3,8 @@ const moment = require('moment');
 require('moment/locale/id');
 const Xendit = require('../../configs/Xendit');
 
-const Account = mongoose.model('Account');
 const Payment = mongoose.model('Payment');
 const Order = mongoose.model('Order');
-const Referral = mongoose.model('Referral');
 
 const api = {
     disbursement_bank: 'https://api.xendit.co/available_disbursements_banks',
@@ -37,6 +35,7 @@ const createVirtualAccount = (request, response) => {
     const { externalId, name, amount, bankCode } = request.body;
     const date = moment();
     const expired = date.utc().add(1, 'days').toISOString();
+
     const payload = {
         external_id: externalId,
         name,
@@ -44,6 +43,7 @@ const createVirtualAccount = (request, response) => {
         bank_code: bankCode,
         expected_amount: amount,
         is_single_use: true,
+        is_closed: true,
         expiration_date: expired
     };
     Xendit('POST', api.virtual_account, payload).then((res) => {
@@ -77,6 +77,7 @@ const createVirtualAccount = (request, response) => {
             });
         });
     }).catch((err) => {
+        console.log(err);
         return response.status(400).json({
             status: true,
             message: 'can\'t create virtual account',
@@ -136,19 +137,13 @@ const createQris = (request, response) => {
 const callbackVirtualAccountPaid = (request, response) => {
     const externalId = request.body.external_id;
 
-    const getProfit = (amount, downlineDiscount, discount) => {
-        const hargaJual = amount * ((100 - downlineDiscount) / 100);
-        const fee = hargaJual * (discount / 100);
-        const result = parseInt(fee, 10);
-        return Math.round(result);
-    };
-
     if (!externalId) {
         return response.status(400).json({
             status: false,
             message: 'couldn\'t find external_id'
         });
     }
+
     Payment.findOne({
         external_id: externalId
     }).then((payment) => {
@@ -159,92 +154,10 @@ const callbackVirtualAccountPaid = (request, response) => {
         }).then((order) => {
             order.status = 'onprocess';
             order.save();
-
-            // Add referral profit
-            Account.findOne({
-                _id: order.account
-            }).then((account) => {
-                /**
-                 * cari upline pertama
-                 */
-                if (account.referral_code !== 'none') {
-                    Account.findOne({
-                        username: account.referral_code
-                    }).then((firstUpline) => {
-                        firstUpline.addons.referral_point += getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit);
-                        firstUpline.save();
-
-                        const firstReferral = new Referral({
-                            account: firstUpline.id,
-                            referral_account: account.id,
-                            amount: getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit)
-                        });
-                        firstReferral.save();
-                        console.log('1');
-
-                        /**
-                         * cari upline kedua
-                         */
-                        if (firstUpline.referral_code !== 'none') {
-                            Account.findOne({
-                                username: firstUpline.referral_code
-                            }).then((secondUpline) => {
-                                secondUpline.addons.referral_point += getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit);
-                                secondUpline.save();
-                                const secondReferral = new Referral({
-                                    account: secondUpline.id,
-                                    referral_account: firstUpline.id,
-                                    amount: getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit)
-                                });
-                                secondReferral.save();
-                                console.log('2');
-
-                                /**
-                                 * cari upline ketiga
-                                 */
-                                if (secondUpline.referral_code !== 'none') {
-                                    Account.findOne({
-                                        username: secondUpline.referral_code
-                                    }).then((thirdUpline) => {
-                                        thirdUpline.addons.referral_point += getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit);
-                                        thirdUpline.save();
-                                        const thirdReferral = new Referral({
-                                            account: thirdUpline.id,
-                                            referral_account: secondUpline.id,
-                                            amount: getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit)
-                                        });
-                                        thirdReferral.save();
-                                        console.log('3');
-
-                                        return response.status(200).json({
-                                            status: true,
-                                            message: 'payment succesfully paid, not have upline',
-                                            data: payment
-                                        });
-                                    });
-                                } else {
-                                    return response.status(200).json({
-                                        status: true,
-                                        message: 'payment succesfully paid, not have upline',
-                                        data: payment
-                                    });
-                                }
-                            });
-                        } else {
-                            return response.status(200).json({
-                                status: true,
-                                message: 'payment succesfully paid, not have upline',
-                                data: payment
-                            });
-                        }
-                    });
-                } else {
-                    return response.status(200).json({
-                        status: true,
-                        message: 'payment succesfully paid, not have upline',
-                        data: payment
-                    });
-                }
+            return response.status(200).json({
+                status: true,
+                message: 'payment succesfully paid',
+                data: payment
             });
         });
     }).catch(() => {
@@ -288,13 +201,6 @@ const callbackQrisPaid = (request, response) => {
     const externalId = request.body.external_id;
     const { status } = request.body;
 
-    const getProfit = (amount, downlineDiscount, discount) => {
-        const hargaJual = amount * ((100 - downlineDiscount) / 100);
-        const fee = hargaJual * (discount / 100);
-        const result = parseInt(fee, 10);
-        return Math.round(result);
-    };
-
     if (!externalId) {
         return response.status(400).json({
             status: false,
@@ -307,103 +213,16 @@ const callbackQrisPaid = (request, response) => {
         if (status === 'COMPLETED') {
             payment.status = 'paid';
             payment.save();
-            Order.findOne({
-                external_id: externalId
-            }).then((order) => {
-                order.status = 'onprocess';
-                order.save();
-
-                // Add referral profit
-                Account.findOne({
-                    _id: order.account
-                }).then((account) => {
-                    /**
-                     * cari upline pertama
-                     */
-                    if (account.referral_code !== 'none') {
-                        Account.findOne({
-                            username: account.referral_code
-                        }).then((firstUpline) => {
-                            firstUpline.addons.referral_point += getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit);
-                            firstUpline.save();
-
-                            const firstReferral = new Referral({
-                                account: firstUpline.id,
-                                referral_account: account.id,
-                                amount: getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit)
-                            });
-                            firstReferral.save();
-                            console.log('1');
-
-                            /**
-                             * cari upline kedua
-                             */
-                            if (firstUpline.referral_code !== 'none') {
-                                Account.findOne({
-                                    username: firstUpline.referral_code
-                                }).then((secondUpline) => {
-                                    secondUpline.addons.referral_point += getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit);
-                                    secondUpline.save();
-                                    const secondReferral = new Referral({
-                                        account: secondUpline.id,
-                                        referral_account: firstUpline.id,
-                                        amount: getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit)
-                                    });
-                                    secondReferral.save();
-                                    console.log('2');
-
-                                    /**
-                                     * cari upline ketiga
-                                     */
-                                    if (secondUpline.referral_code !== 'none') {
-                                        Account.findOne({
-                                            username: secondUpline.referral_code
-                                        }).then((thirdUpline) => {
-                                            thirdUpline.addons.referral_point += getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit);
-                                            thirdUpline.save();
-                                            const thirdReferral = new Referral({
-                                                account: thirdUpline.id,
-                                                referral_account: secondUpline.id,
-                                                amount: getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit)
-                                            });
-                                            thirdReferral.save();
-                                            console.log('3');
-
-                                            return response.status(200).json({
-                                                status: true,
-                                                message: 'payment succesfully paid, not have upline',
-                                                data: payment
-                                            });
-                                        });
-                                    } else {
-                                        return response.status(200).json({
-                                            status: true,
-                                            message: 'payment succesfully paid, not have upline',
-                                            data: payment
-                                        });
-                                    }
-                                });
-                            } else {
-                                return response.status(200).json({
-                                    status: true,
-                                    message: 'payment succesfully paid, not have upline',
-                                    data: payment
-                                });
-                            }
-                        });
-                    } else {
-                        return response.status(200).json({
-                            status: true,
-                            message: 'payment succesfully paid, not have upline',
-                            data: payment
-                        });
-                    }
-                });
+            return response.status(200).json({
+                status: true,
+                message: 'payment succesfully paid',
+                data: payment
             });
         }
-        return response.status(400).json({
-            status: false,
-            message: 'undefined status'
+        return response.status(200).json({
+            status: true,
+            message: 'payment succesfully paid, not have upline',
+            data: payment
         });
     }).catch(() => {
         return response.status(400).json({
