@@ -282,6 +282,23 @@ const checkPaymentStatus = (request, response) => {
     });
 };
 
+const getQris = (request, response) => {
+    const { externalId } = request.params;
+    Xendit('GET', `${api.qris}/${externalId}`).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'qr code successfully created',
+            data: res
+        });
+    }).catch((err) => {
+        return response.status(err).json({
+            status: true,
+            message: 'can\'t create qr code payment',
+            data: err
+        });
+    });
+};
+
 const PaymentController = {
     checkAvailableVirtualAccount,
     createVirtualAccount,
@@ -290,6 +307,7 @@ const PaymentController = {
     callbackVirtualAccountUpdate,
     createQris,
     callbackQrisPaid,
+    getQris,
     getPayment,
     checkPaymentStatus
 };

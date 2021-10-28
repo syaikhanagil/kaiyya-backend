@@ -4,6 +4,7 @@
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 // const Mailer = require('../../mail');
 
 const Account = mongoose.model('Account');
@@ -65,7 +66,7 @@ exports.getAccounts = (request, response) => {
                     email: filterAccount[i].email,
                     phone: filterAccount[i].phone,
                     role: filterAccount[i].role,
-                    created: filterAccount[i].createdAt,
+                    created: moment(filterAccount[i].createdAt).format('LL'),
                     verified: filterAccount[i].verified,
                     addons: filterAccount[i].addons
                 };

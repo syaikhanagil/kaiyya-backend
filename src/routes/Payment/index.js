@@ -13,6 +13,7 @@ router.post('/callback/xendit/virtual-account/update', PaymentController.callbac
 router.get('/test/vx/:externalId', PaymentController.testVirtualAccountPay);
 
 router.post('/callback/xendit/qris/paid', PaymentController.callbackQrisPaid);
+router.get('/c/qris/:externalId', PaymentController.getQris);
 
 const paymentRoutes = router;
 
