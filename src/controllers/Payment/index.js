@@ -5,6 +5,7 @@ const Xendit = require('../../configs/Xendit');
 
 const Payment = mongoose.model('Payment');
 const Order = mongoose.model('Order');
+const Size = mongoose.model('Size');
 
 const api = {
     disbursement_bank: 'https://api.xendit.co/available_disbursements_banks',
@@ -77,7 +78,6 @@ const createVirtualAccount = (request, response) => {
             });
         });
     }).catch((err) => {
-        console.log(err);
         return response.status(400).json({
             status: true,
             message: 'can\'t create virtual account',
@@ -183,6 +183,34 @@ const callbackVirtualAccountUpdate = (request, response) => {
         if (status === 'INACTIVE') {
             payment.status = 'inactive';
             payment.save();
+            Order.findOne({
+                _id: payment.order
+            }).populate('order_detail').then((order) => {
+                const detail = order.order_detail;
+                for (let i = 0; i < detail.length; i++) {
+                    // return the reduced stock
+                    Size.findOne({
+                        _id: detail[i].size
+                    }).then((size) => {
+                        const currentStock = size.stock;
+                        const newStock = currentStock + detail[i].qty;
+                        size.stock = newStock;
+                        size.save();
+                    });
+                }
+                order.status = 'cancel';
+                order.save();
+
+                return response.status(200).json({
+                    status: true,
+                    message: 'successfully cancel order'
+                });
+            }).catch(() => {
+                return response.status(400).json({
+                    status: false,
+                    message: 'failed to cancel order'
+                });
+            });
         }
         return response.status(200).json({
             status: true,
@@ -198,7 +226,7 @@ const callbackVirtualAccountUpdate = (request, response) => {
 };
 
 const callbackQrisPaid = (request, response) => {
-    const externalId = request.body.external_id;
+    const externalId = request.body.qr_code.external_id;
     const { status } = request.body;
 
     if (!externalId) {
