@@ -48,6 +48,7 @@ exports.getDisbursement = (request, response) => {
         for (let i = 0; i < disbursement.length; i++) {
             const obj = {
                 id: disbursement[i].id,
+                account: disbursement[i].account,
                 bank_name_holder: disbursement[i].bank_name_holder,
                 bank_code: disbursement[i].bank_code,
                 bank_number: disbursement[i].bank_number

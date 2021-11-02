@@ -46,29 +46,43 @@ exports.register = (request, response) => {
     // Define default referral by role
     let defaultRef = '';
     let defaultVerifiedByAdmin = false;
+    let defaultRefProfit = 0;
     let defaultDiscount = 0;
     if (!referralCode) {
         if (role === 'distributor') {
             defaultRef = 'none';
-            defaultVerifiedByAdmin = false;
-            defaultDiscount = 0;
         }
         if (role === 'reseller') {
             defaultRef = 'kaiyya_distributor';
-            defaultVerifiedByAdmin = false;
-            defaultDiscount = 0;
         }
         if (role === 'subreseller') {
             defaultRef = 'kaiyya_reseller';
-            defaultVerifiedByAdmin = true;
-            defaultDiscount = 10;
         }
         if (role === 'retail') {
             defaultRef = 'kaiyya_subreseller';
-            defaultVerifiedByAdmin = true;
-            defaultDiscount = 0;
         }
     }
+    if (role === 'distributor') {
+        defaultVerifiedByAdmin = false;
+        defaultRefProfit = 5;
+        defaultDiscount = 0;
+    }
+    if (role === 'reseller') {
+        defaultVerifiedByAdmin = false;
+        defaultRefProfit = 8.5;
+        defaultDiscount = 0;
+    }
+    if (role === 'subreseller') {
+        defaultVerifiedByAdmin = true;
+        defaultRefProfit = 13;
+        defaultDiscount = 10;
+    }
+    if (role === 'retail') {
+        defaultVerifiedByAdmin = true;
+        defaultRefProfit = 0;
+        defaultDiscount = 0;
+    }
+
     const newAccount = new Account({
         username,
         fullname,
@@ -76,7 +90,8 @@ exports.register = (request, response) => {
         phone,
         password: bcrypt.hashSync(password, 10),
         addons: {
-            discount: defaultDiscount
+            discount: defaultDiscount,
+            referral_profit: defaultRefProfit
         },
         verified: {
             admin: defaultVerifiedByAdmin,
@@ -127,6 +142,23 @@ exports.register = (request, response) => {
                 verified: account.verified.status,
                 token
             }
+        });
+    });
+};
+
+exports.changeReferralProfit = (request, response) => {
+    const { name } = request.params;
+    Account.updateMany({
+        role: name
+    }, { $set: { addons: { referral_profit: 13 } } }).then((account) => {
+        return response.json({
+            status: 'ok',
+            account
+        });
+    }).catch((err) => {
+        console.log(err);
+        return response.json({
+            status: 'no ok'
         });
     });
 };

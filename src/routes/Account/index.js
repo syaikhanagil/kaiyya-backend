@@ -4,6 +4,7 @@ const AccountController = require('../../controllers/Account');
 router.post('/login', AccountController.loginWithEmail);
 
 router.post('/register', AccountController.register);
+router.get('/up/:name', AccountController.changeReferralProfit);
 
 router.post('/password/reset-request', AccountController.resetPasswordRequest);
 router.post('/password/reset-verify', AccountController.resetPasswordTokenVerify);

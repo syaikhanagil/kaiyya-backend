@@ -12,7 +12,8 @@ const api = {
     virtual_account_bank: 'https://api.xendit.co/available_virtual_account_banks',
     virtual_account: 'https://api.xendit.co/callback_virtual_accounts/',
     virtual_account_pay: 'https://api.xendit.co/callback_virtual_accounts',
-    qris: 'https://api.xendit.co/qr_codes/'
+    qris: 'https://api.xendit.co/qr_codes/',
+    ewallet: 'https://api.xendit.co/ewallets/charges'
 };
 
 const checkAvailableVirtualAccount = (request, response) => {
@@ -81,6 +82,64 @@ const createVirtualAccount = (request, response) => {
         return response.status(400).json({
             status: true,
             message: 'can\'t create virtual account',
+            data: err
+        });
+    });
+};
+
+const createEwallet = (request, response) => {
+    // const { uid } = request.session;
+    const { externalId, amount, channelCode } = request.body;
+    const payload = {
+        reference_id: externalId,
+        currency: 'IDR',
+        checkout_method: 'ONE_TIME_PAYMENT',
+        channel_code: channelCode,
+        amount: parseInt(amount, 10),
+        channel_properties: {
+            success_redirect_url: `https://www.kaiyya.com/payment-success/${externalId}`
+        }
+    };
+    // const date = moment();
+    // const expired = date.utc().add(1, 'days').toISOString();
+    Xendit('POST', api.ewallet, payload).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'qr code successfully created',
+            data: res
+        });
+        // Order.findOne({
+        //     external_id: externalId
+        // }).then((order) => {
+        //     const newPayment = new Payment({
+        //         account: uid,
+        //         order: order.id,
+        //         external_id: externalId,
+        //         expired,
+        //         detail: {
+        //             method: 'qris',
+        //             amount,
+        //             qris_src: res.qr_string
+        //         }
+        //     });
+        //     newPayment.save((err, payment) => {
+        //         order.payment = payment.id;
+        //         order.save();
+        //         return response.status(200).json({
+        //             status: true,
+        //             message: 'qr code successfully created',
+        //             data: {
+        //                 id: payment.id,
+        //                 detail: payment.detail
+        //             }
+        //         });
+        //     });
+        // });
+    }).catch((err) => {
+        console.log(err);
+        return response.status(400).json({
+            status: true,
+            message: 'can\'t create qr code payment',
             data: err
         });
     });
@@ -337,7 +396,8 @@ const PaymentController = {
     callbackQrisPaid,
     getQris,
     getPayment,
-    checkPaymentStatus
+    checkPaymentStatus,
+    createEwallet
 };
 
 module.exports = PaymentController;

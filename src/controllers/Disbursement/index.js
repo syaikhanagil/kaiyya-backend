@@ -27,7 +27,7 @@ const createDisbursement = (request, response) => {
             channel: 'disbursement',
             group: `KFE-10${uniqcode}`,
             title: 'Penarikan Imbalan',
-            message: `Penarikan imbalan dengan nominal Rp ${new Intl.NumberFormat().format(amount)} berhasil diajukan, tunggu konfirmasi dari Admin Kaiyya. Konfirmasi ini membutuhkan waktu 1x24 Jam.`
+            message: `Penarikan imbalan dengan nominal Rp ${new Intl.NumberFormat().format(amount)} berhasil diajukan. Penarikan imbalan akan diproses maksimum 1x24 Jam. Hubungi admin jika ingin diproses kurang dari 24 Jam.`
         });
         newNotification.save();
         Account.findOne({

@@ -13,6 +13,7 @@ const getPrivateNotification = (request, response) => {
                 id: notification[i].id,
                 title: notification[i].title,
                 message: notification[i].message,
+                channel: notification[i].channel,
                 status: notification[i].status
             };
             data.push(obj);
@@ -33,6 +34,7 @@ const getPublicNotification = (request, response) => {
                 id: notification[i].id,
                 title: notification[i].title,
                 message: notification[i].message,
+                channel: notification[i].channel,
                 status: notification[i].status
             };
             data.push(obj);
@@ -50,6 +52,8 @@ const getNotificationDetail = (request, response) => {
     Notification.findOne({
         _id: notificationId
     }).then((notification) => {
+        notification.status = 'read';
+        notification.save();
         return response.status(200).json({
             status: true,
             message: 'successfully get notification data',

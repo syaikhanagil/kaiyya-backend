@@ -5,6 +5,7 @@ router.get('/:paymentId', PaymentController.getPayment);
 router.post('/check/:paymentId', PaymentController.checkPaymentStatus);
 router.post('/virtual-account', PaymentController.createVirtualAccount);
 router.post('/qris', PaymentController.createQris);
+router.post('/ewallet', PaymentController.createEwallet);
 
 router.get('/available/virtual-account', PaymentController.checkAvailableVirtualAccount);
 

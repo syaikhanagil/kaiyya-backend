@@ -1,22 +1,21 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+require('moment/locale/id');
 const Xendit = require('../../configs/Xendit');
 
-const Account = mongoose.model('Account');
 const Payment = mongoose.model('Payment');
 const Order = mongoose.model('Order');
-const Referral = mongoose.model('Referral');
+const Size = mongoose.model('Size');
 
 const api = {
-    virtual_account_bank: 'https://api.xendit.co/available_virtual_account_banks',
+    disbursement_bank: 'https://api.xendit.co/available_disbursements_banks',
+    available_virtual_account_bank: 'https://api.xendit.co/available_available_virtual_account_banks',
     virtual_account: 'https://api.xendit.co/callback_virtual_accounts/',
-    virtual_account_pay: 'https://api.xendit.co/callback_virtual_accounts',
-    qris: 'https://api.xendit.co/qr_codes/',
-    disbursement_bank: 'https://api.xendit.co/available_disbursements_banks'
+    qris: 'https://api.xendit.co/qr_codes/'
 };
 
 const checkAvailableVirtualAccount = (request, response) => {
-    Xendit('GET', api.virtual_account_bank).then((res) => {
+    Xendit('GET', api.available_virtual_account_bank).then((res) => {
         return response.status(200).json({
             status: true,
             message: 'successfully get virtual account bank',
@@ -31,13 +30,12 @@ const checkAvailableVirtualAccount = (request, response) => {
     });
 };
 
-/**
- * CREATE VIRTUAL ACCOUNT
- */
 const createVirtualAccount = (request, response) => {
     const { uid } = request.session;
     const { externalId, name, amount, bankCode } = request.body;
     const date = moment();
+    const expired = date.utc().add(1, 'days').toISOString();
+
     const payload = {
         external_id: externalId,
         name,
@@ -45,9 +43,14 @@ const createVirtualAccount = (request, response) => {
         bank_code: bankCode,
         expected_amount: amount,
         is_single_use: true,
-        expiration_date: date.utc().add(1, 'days').toISOString()
+        is_closed: true,
+        expiration_date: expired
     };
     Xendit('POST', api.virtual_account, payload).then((res) => {
+        // return response.status(200).json({
+        //     status: 200,
+        //     data: res
+        // });
         Order.findOne({
             external_id: externalId
         }).then((order) => {
@@ -55,6 +58,7 @@ const createVirtualAccount = (request, response) => {
                 account: uid,
                 order: order.id,
                 external_id: externalId,
+                expired,
                 detail: {
                     method: 'virtual-account',
                     name,
@@ -85,18 +89,17 @@ const createVirtualAccount = (request, response) => {
     });
 };
 
-/**
- * CREATE QRIS
- */
 const createQris = (request, response) => {
     const { uid } = request.session;
     const { externalId, amount } = request.body;
     const payload = {
         external_id: externalId,
         type: 'DYNAMIC',
-        callback_url: 'https://kaiyya.com/payment/callback/xendit/qris/paid',
+        callback_url: 'https://api.kaiyya.com/payment/callback/xendit/qris/paid',
         amount
     };
+    const date = moment();
+    const expired = date.utc().add(1, 'days').toISOString();
     Xendit('POST', api.qris, payload).then((res) => {
         Order.findOne({
             external_id: externalId
@@ -105,6 +108,7 @@ const createQris = (request, response) => {
                 account: uid,
                 order: order.id,
                 external_id: externalId,
+                expired,
                 detail: {
                     method: 'qris',
                     amount,
@@ -133,18 +137,8 @@ const createQris = (request, response) => {
     });
 };
 
-/**
- * VIRTUAL ACCOUNT PAID CALLBACK
- */
 const callbackVirtualAccountPaid = (request, response) => {
     const externalId = request.body.external_id;
-
-    const getProfit = (amount, downlineDiscount, discount) => {
-        const hargaJual = amount * ((100 - downlineDiscount) / 100);
-        const fee = hargaJual * (discount / 100);
-        const result = parseInt(fee, 10);
-        return Math.round(result);
-    };
 
     if (!externalId) {
         return response.status(400).json({
@@ -152,6 +146,7 @@ const callbackVirtualAccountPaid = (request, response) => {
             message: 'couldn\'t find external_id'
         });
     }
+
     Payment.findOne({
         external_id: externalId
     }).then((payment) => {
@@ -162,92 +157,10 @@ const callbackVirtualAccountPaid = (request, response) => {
         }).then((order) => {
             order.status = 'onprocess';
             order.save();
-
-            // Add referral profit
-            Account.findOne({
-                _id: order.account
-            }).then((account) => {
-                /**
-                 * cari upline pertama
-                 */
-                if (account.referral_code !== 'none') {
-                    Account.findOne({
-                        username: account.referral_code
-                    }).then((firstUpline) => {
-                        firstUpline.addons.referral_point += getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit);
-                        firstUpline.save();
-
-                        const firstReferral = new Referral({
-                            account: firstUpline.id,
-                            referral_account: account.id,
-                            amount: getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit)
-                        });
-                        firstReferral.save();
-                        console.log('1');
-
-                        /**
-                         * cari upline kedua
-                         */
-                        if (firstUpline.referral_code !== 'none') {
-                            Account.findOne({
-                                username: firstUpline.referral_code
-                            }).then((secondUpline) => {
-                                secondUpline.addons.referral_point += getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit);
-                                secondUpline.save();
-                                const secondReferral = new Referral({
-                                    account: secondUpline.id,
-                                    referral_account: firstUpline.id,
-                                    amount: getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit)
-                                });
-                                secondReferral.save();
-                                console.log('2');
-
-                                /**
-                                 * cari upline ketiga
-                                 */
-                                if (secondUpline.referral_code !== 'none') {
-                                    Account.findOne({
-                                        username: secondUpline.referral_code
-                                    }).then((thirdUpline) => {
-                                        thirdUpline.addons.referral_point += getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit);
-                                        thirdUpline.save();
-                                        const thirdReferral = new Referral({
-                                            account: thirdUpline.id,
-                                            referral_account: secondUpline.id,
-                                            amount: getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit)
-                                        });
-                                        thirdReferral.save();
-                                        console.log('3');
-
-                                        return response.status(200).json({
-                                            status: true,
-                                            message: 'payment succesfully paid, not have upline',
-                                            data: payment
-                                        });
-                                    });
-                                } else {
-                                    return response.status(200).json({
-                                        status: true,
-                                        message: 'payment succesfully paid, not have upline',
-                                        data: payment
-                                    });
-                                }
-                            });
-                        } else {
-                            return response.status(200).json({
-                                status: true,
-                                message: 'payment succesfully paid, not have upline',
-                                data: payment
-                            });
-                        }
-                    });
-                } else {
-                    return response.status(200).json({
-                        status: true,
-                        message: 'payment succesfully paid, not have upline',
-                        data: payment
-                    });
-                }
+            return response.status(200).json({
+                status: true,
+                message: 'payment succesfully paid',
+                data: payment
             });
         });
     }).catch(() => {
@@ -258,9 +171,6 @@ const callbackVirtualAccountPaid = (request, response) => {
     });
 };
 
-/**
- * VIRTUAL ACCOUNT UPDATE CALLBACK
- */
 const callbackVirtualAccountUpdate = (request, response) => {
     const externalId = request.body.external_id;
     const { status } = request.body;
@@ -276,6 +186,34 @@ const callbackVirtualAccountUpdate = (request, response) => {
         if (status === 'INACTIVE') {
             payment.status = 'inactive';
             payment.save();
+            Order.findOne({
+                _id: payment.order
+            }).populate('order_detail').then((order) => {
+                const detail = order.order_detail;
+                for (let i = 0; i < detail.length; i++) {
+                    // return the reduced stock
+                    Size.findOne({
+                        _id: detail[i].size
+                    }).then((size) => {
+                        const currentStock = size.stock;
+                        const newStock = currentStock + detail[i].qty;
+                        size.stock = newStock;
+                        size.save();
+                    });
+                }
+                order.status = 'cancel';
+                order.save();
+
+                return response.status(200).json({
+                    status: true,
+                    message: 'successfully cancel order'
+                });
+            }).catch(() => {
+                return response.status(400).json({
+                    status: false,
+                    message: 'failed to cancel order'
+                });
+            });
         }
         return response.status(200).json({
             status: true,
@@ -290,19 +228,9 @@ const callbackVirtualAccountUpdate = (request, response) => {
     });
 };
 
-/**
- * QRIS PAID CALLBACK
- */
 const callbackQrisPaid = (request, response) => {
-    const externalId = request.body.external_id;
+    const externalId = request.body.qr_code.external_id;
     const { status } = request.body;
-
-    const getProfit = (amount, downlineDiscount, discount) => {
-        const hargaJual = amount * ((100 - downlineDiscount) / 100);
-        const fee = hargaJual * (discount / 100);
-        const result = parseInt(fee, 10);
-        return Math.round(result);
-    };
 
     if (!externalId) {
         return response.status(400).json({
@@ -316,103 +244,16 @@ const callbackQrisPaid = (request, response) => {
         if (status === 'COMPLETED') {
             payment.status = 'paid';
             payment.save();
-            Order.findOne({
-                external_id: externalId
-            }).then((order) => {
-                order.status = 'onprocess';
-                order.save();
-
-                // Add referral profit
-                Account.findOne({
-                    _id: order.account
-                }).then((account) => {
-                    /**
-                     * cari upline pertama
-                     */
-                    if (account.referral_code !== 'none') {
-                        Account.findOne({
-                            username: account.referral_code
-                        }).then((firstUpline) => {
-                            firstUpline.addons.referral_point += getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit);
-                            firstUpline.save();
-
-                            const firstReferral = new Referral({
-                                account: firstUpline.id,
-                                referral_account: account.id,
-                                amount: getProfit(order.subtotal, account.addons.discount, firstUpline.addons.referral_profit)
-                            });
-                            firstReferral.save();
-                            console.log('1');
-
-                            /**
-                             * cari upline kedua
-                             */
-                            if (firstUpline.referral_code !== 'none') {
-                                Account.findOne({
-                                    username: firstUpline.referral_code
-                                }).then((secondUpline) => {
-                                    secondUpline.addons.referral_point += getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit);
-                                    secondUpline.save();
-                                    const secondReferral = new Referral({
-                                        account: secondUpline.id,
-                                        referral_account: firstUpline.id,
-                                        amount: getProfit(order.subtotal, firstUpline.addons.discount, secondUpline.addons.referral_profit)
-                                    });
-                                    secondReferral.save();
-                                    console.log('2');
-
-                                    /**
-                                     * cari upline ketiga
-                                     */
-                                    if (secondUpline.referral_code !== 'none') {
-                                        Account.findOne({
-                                            username: secondUpline.referral_code
-                                        }).then((thirdUpline) => {
-                                            thirdUpline.addons.referral_point += getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit);
-                                            thirdUpline.save();
-                                            const thirdReferral = new Referral({
-                                                account: thirdUpline.id,
-                                                referral_account: secondUpline.id,
-                                                amount: getProfit(order.subtotal, secondUpline.addons.discount, thirdUpline.addons.referral_profit)
-                                            });
-                                            thirdReferral.save();
-                                            console.log('3');
-
-                                            return response.status(200).json({
-                                                status: true,
-                                                message: 'payment succesfully paid, not have upline',
-                                                data: payment
-                                            });
-                                        });
-                                    } else {
-                                        return response.status(200).json({
-                                            status: true,
-                                            message: 'payment succesfully paid, not have upline',
-                                            data: payment
-                                        });
-                                    }
-                                });
-                            } else {
-                                return response.status(200).json({
-                                    status: true,
-                                    message: 'payment succesfully paid, not have upline',
-                                    data: payment
-                                });
-                            }
-                        });
-                    } else {
-                        return response.status(200).json({
-                            status: true,
-                            message: 'payment succesfully paid, not have upline',
-                            data: payment
-                        });
-                    }
-                });
+            return response.status(200).json({
+                status: true,
+                message: 'payment succesfully paid',
+                data: payment
             });
         }
-        return response.status(400).json({
-            status: false,
-            message: 'undefined status'
+        return response.status(200).json({
+            status: true,
+            message: 'payment succesfully paid, not have upline',
+            data: payment
         });
     }).catch(() => {
         return response.status(400).json({
@@ -422,9 +263,6 @@ const callbackQrisPaid = (request, response) => {
     });
 };
 
-/**
- * TESTING VIRTUAL ACCOUNT PAY
- */
 const testVirtualAccountPay = (request, response) => {
     const { externalId } = request.params;
     const payload = {
@@ -463,6 +301,35 @@ const getPayment = (request, response) => {
     });
 };
 
+const checkPaymentStatus = (request, response) => {
+    const { paymentId } = request.params;
+    Payment.findOne({
+        _id: paymentId
+    }).then((payment) => {
+        return response.status(200).json({
+            status: true,
+            payment_status: payment.status
+        });
+    });
+};
+
+const getQris = (request, response) => {
+    const { externalId } = request.params;
+    Xendit('GET', `${api.qris}/${externalId}`).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'qr code successfully created',
+            data: res
+        });
+    }).catch((err) => {
+        return response.status(err).json({
+            status: true,
+            message: 'can\'t create qr code payment',
+            data: err
+        });
+    });
+};
+
 const XenditController = {
     checkAvailableVirtualAccount,
     createVirtualAccount,
@@ -471,7 +338,9 @@ const XenditController = {
     callbackVirtualAccountUpdate,
     createQris,
     callbackQrisPaid,
-    getPayment
+    getQris,
+    getPayment,
+    checkPaymentStatus
 };
 
 module.exports = XenditController;

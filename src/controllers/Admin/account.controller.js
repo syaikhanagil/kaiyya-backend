@@ -66,6 +66,7 @@ exports.getAccounts = (request, response) => {
                     email: filterAccount[i].email,
                     phone: filterAccount[i].phone,
                     role: filterAccount[i].role,
+                    referral_code: filterAccount[i].referral_code,
                     created: moment(filterAccount[i].createdAt).format('LL'),
                     verified: filterAccount[i].verified,
                     addons: filterAccount[i].addons
