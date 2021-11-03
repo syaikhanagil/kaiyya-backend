@@ -268,6 +268,7 @@ exports.confirmOrder = (request, response) => {
                 /**
                  * cari upline pertama
                  */
+                account.shopping_point += order.point ? order.point : 0;
                 if (account.referral_code !== 'none') {
                     Account.findOne({
                         username: account.referral_code

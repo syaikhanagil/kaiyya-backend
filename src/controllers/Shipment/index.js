@@ -40,7 +40,8 @@ const getService = (request, response) => {
     const data = [
         { name: 'JNE', code: 'jne' },
         { name: 'J&T', code: 'jnt' },
-        { name: 'Lion Parcel', code: 'lion' }
+        { name: 'Lion Parcel', code: 'lion' },
+        { name: 'Anter Aja', code: 'anteraja' }
     ];
     return response.status(200).json({
         status: true,

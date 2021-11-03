@@ -6,8 +6,8 @@ const Product = mongoose.model('Product');
 const Size = mongoose.model('Size');
 
 const createOrder = (request, response) => {
-    const { products, address, courierName, courierCode, courierService, courierCost, discount, notes, subtotal } = request.body;
     const { uid } = request.session;
+    const { products, address, courierName, courierCode, courierService, courierCost, discount, notes, subtotal, point, shipment } = request.body;
     const invoiceCode = Math.floor(1000000 + Math.random() * 9000000);
     const newOrder = new Order({
         account: uid,
@@ -15,13 +15,25 @@ const createOrder = (request, response) => {
         external_id: `KIS-00${invoiceCode}`,
         discount,
         notes,
+        point,
         courier: {
             name: courierName,
             code: courierCode,
             service: courierService,
             cost: courierCost
         },
-        subtotal: subtotal + courierCost
+        subtotal: subtotal + courierCost,
+        shipment: {
+            name: shipment.name,
+            phone: shipment.phone,
+            province: shipment.province,
+            province_id: shipment.provinceId,
+            city: shipment.city,
+            city_id: shipment.cityId,
+            subdistrict: shipment.subdistrict,
+            subdistrict_id: shipment.subdistrictId,
+            detail: shipment.detail
+        }
     });
     newOrder.save((err, order) => {
         if (err) {
@@ -103,7 +115,8 @@ const getOrder = (request, response) => {
                 payment: orders[i].payment,
                 order_detail: orders[i].order_detail,
                 resi: orders[i].resi,
-                address: orders[i].address
+                address: orders[i].address,
+                shipment: orders[i].shipment
             };
             data.push(obj);
         }
