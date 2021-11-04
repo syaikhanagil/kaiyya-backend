@@ -22,7 +22,7 @@ exports.approveDisbursement = (request, response) => {
             account_number: disbursement.bank_number,
             bank_code: disbursement.bank_code,
             description: 'Penarikan Fee Edukasi',
-            amount: disbursement.amount
+            amount: disbursement.amount - 6500
         };
         Xendit('POST', api.disbursement, payload).then((res) => {
             disbursement.status = 'approved';
@@ -51,7 +51,9 @@ exports.getDisbursement = (request, response) => {
                 account: disbursement[i].account,
                 bank_name_holder: disbursement[i].bank_name_holder,
                 bank_code: disbursement[i].bank_code,
-                bank_number: disbursement[i].bank_number
+                bank_number: disbursement[i].bank_number,
+                amount: disbursement[i].amount,
+                status: disbursement[i].status
             };
             data.push(obj);
         }

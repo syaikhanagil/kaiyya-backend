@@ -70,7 +70,8 @@ router.post('/order/confirm/:orderId', AdminController.confirmOrder);
 router.post('/order/add-resi/:orderId', AdminController.addOrderResi);
 
 router.get('/disbursement/', AdminController.getDisbursement);
-router.get('/disbursement/:disbursementId', AdminController.approveDisbursement);
+// router.get('/disbursement/:disbursementId', AdminController.approveDisbursement);
+router.post('/disbursement/approve/:disbursementId', AdminController.approveDisbursement);
 
 // Faq Controller
 router.post('/faq', AdminController.createFaq);
