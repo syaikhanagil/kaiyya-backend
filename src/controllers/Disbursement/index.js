@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Xendit = require('../../configs/Xendit');
 
 const Account = mongoose.model('Account');
 const Disbursement = mongoose.model('Disbursement');
@@ -129,11 +130,36 @@ const callbackDisbursement = (request, response) => {
     });
 };
 
+const dsb = (request, response) => {
+    const payload = {
+        external_id: 'TEST-DSB',
+        account_holder_name: 'Saekhan Agil',
+        account_number: '1570007422034',
+        bank_code: 'MANDIRI',
+        description: 'TESTPenarikan Fee Edukasi',
+        amount: 200000
+    };
+    Xendit('POST', 'https://api.xendit.co/disbursements', payload).then((res) => {
+        return response.status(200).json({
+            status: true,
+            message: 'successfully request disbursement',
+            data: res
+        });
+    }).catch((err) => {
+        return response.status(400).json({
+            status: true,
+            message: 'can\'t create disbursement request',
+            data: err
+        });
+    });
+};
+
 const DisbursementController = {
     createDisbursement,
     getDisbursement,
     getDisbursementDetail,
-    callbackDisbursement
+    callbackDisbursement,
+    dsb
 };
 
 module.exports = DisbursementController;

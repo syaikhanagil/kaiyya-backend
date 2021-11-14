@@ -223,12 +223,32 @@ const updateOrderStatus = (request, response) => {
     });
 };
 
+const confirmOrder = (request, response) => {
+    const { orderId } = request.params;
+    Order.findOne({
+        _id: orderId
+    }).then((order) => {
+        order.status = 'done';
+        order.save();
+        return response.status(200).json({
+            status: true,
+            message: 'successfully update order status'
+        });
+    }).catch(() => {
+        return response.status(200).json({
+            status: false,
+            message: 'failed to update order status'
+        });
+    });
+};
+
 const OrderController = {
     createOrder,
     getOrder,
     getOrderDetail,
     cancelOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    confirmOrder
 };
 
 module.exports = OrderController;
